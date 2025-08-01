@@ -1,39 +1,116 @@
-import { create } from 'zustand';
-import { AuthStore } from '../types/auth';
+// authStore.ts
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
-  // State
+import { create } from 'zustand';
+import { AuthStore, User } from '../types/auth';
+import { AuthRequestPromptOptions, AuthSessionResult } from 'expo-auth-session';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+// const API_URL = 'http://192.168.1.100:3000'; // <-- CHANGE THIS TO YOUR IP ADDRESS
+
+export const useAuthStore = create<AuthStore>((set) => ({
+  // --- STATE ---
   user: null,
+  authToken: null, // This holds the JWT from *your* backend
   isAuthenticated: false,
   isOnboardingComplete: false,
   isLoading: false,
+  
+  isRehydrating: true, // Used to show a loading screen on app start
 
-  // Actions
-  signInWithGoogle: async () => {
+
+
+  /**
+   * Handles the entire Google Sign-In flow, from showing the prompt
+   * to authenticating with our backend and storing the session token.
+   */
+  
+  signInWithGoogle: async (promptAsync: (options?: AuthRequestPromptOptions) => Promise<AuthSessionResult>) => {
     set({ isLoading: true });
     try {
-      // TODO: Implement Google OAuth
-      console.log('Google sign-in clicked');
-      set({ isLoading: false });
+      // 1. Show the Google login prompt to the user
+      const result = await promptAsync();
+
+      // 2. Check if the login was successful and we received an id_token
+      if (result.type === 'success' && result.params.id_token) {
+        const { id_token } = result.params;
+
+        // 3. Send the Google id_token to our backend for verification
+        const backendResponse = await fetch(`${API_URL}/api/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: id_token }),
+        });
+
+        if (!backendResponse.ok) {
+          const errorData = await backendResponse.json();
+          throw new Error(errorData.message || 'Authentication with backend failed.');
+        }
+
+        // 4. Get our own app token (JWT) and user data from the backend
+        const { token, user } = await backendResponse.json();
+
+        // 5. Store our app token securely on the device for session persistence
+        await AsyncStorage.setItem('authToken', token);
+
+        // 6. Update the app state to reflect the successful login
+        set({
+          user,
+          authToken: token,
+          isAuthenticated: true,
+          isOnboardingComplete: user.onboardingComplete,
+          isLoading: false,
+        });
+      } else {
+        // The user cancelled the login prompt
+        set({ isLoading: false });
+      }
     } catch (error) {
-      console.error('Sign-in error:', error);
-      set({ isLoading: false });
+      console.error('Full Sign-in process error:', error);
+      // Ensure we are fully logged out on any failure
+      await AsyncStorage.removeItem('authToken');
+      set({ isLoading: false, authToken: null, user: null, isAuthenticated: false });
     }
   },
 
-  signOut: () => {
+  /**
+   * Logs the user out by clearing the token from storage and resetting the state.
+   */
+  signOut: async () => {
+    set({ isLoading: true });
+    await AsyncStorage.removeItem('authToken');
     set({
       user: null,
+      authToken: null,
       isAuthenticated: false,
       isOnboardingComplete: false,
+      isLoading: false,
     });
   },
 
-  setUser: (user) => {
-    set({ user, isAuthenticated: !!user });
+  /**
+   * Checks for a stored token on app startup to keep the user logged in.
+   */
+  rehydrateAuth: async () => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (token) {
+      
+        set({ authToken: token, isAuthenticated: true });
+      }
+    } catch (e) {
+      console.error("Failed to rehydrate auth token from storage", e);
+    } finally {
+      // After checking storage, we are no longer rehydrating
+      set({ isRehydrating: false });
+    }
   },
 
-  setOnboardingComplete: (complete) => {
+  /**
+   * Updates the onboarding status in the state.
+   */
+  setOnboardingComplete: (complete: boolean) => {
     set({ isOnboardingComplete: complete });
+
   },
 }));

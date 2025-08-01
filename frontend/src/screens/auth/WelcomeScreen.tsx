@@ -1,3 +1,5 @@
+// welcomeScreen.tsx
+
 import React, { useEffect } from 'react';
 import {
   View,
@@ -7,6 +9,11 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
+
+// import React, { useState, useEffect } from 'react';
+// import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
+// import { jwtDecode } from 'jwt-decode';
+// import type { User } from '../types';
 
 export default function WelcomeScreen() {
   const fadeAnim = new Animated.Value(0);
