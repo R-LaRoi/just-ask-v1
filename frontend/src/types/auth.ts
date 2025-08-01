@@ -10,22 +10,20 @@ export interface User {
     onboardingComplete: boolean;
   }
   
-  export interface AuthState {
- user: User | null;
+export interface AuthState {
+  user: User | null;
   authToken: string | null; 
   isAuthenticated: boolean;
   isOnboardingComplete: boolean;
   isLoading: boolean;
   isRehydrating: boolean;    
-  }
+}
   
-  export interface AuthActions {
-    signInWithGoogle: (options?: AuthRequestPromptOptions) => Promise<AuthSessionResult>;
-    signOut: () => Promise<void>;
-    setUser: (user: User | null) => void;
-    rehydrateAuth: () => Promise<void>
-    setOnboardingComplete: (complete: boolean) => void;
+export interface AuthActions {
+  signInWithGoogle: (promptAsync: (options?: AuthRequestPromptOptions) => Promise<AuthSessionResult>) => Promise<void>;
+  signOut: () => Promise<void>;
+  rehydrateAuth: () => Promise<void>;
+  setOnboardingComplete: (complete: boolean) => void;
+}
   
-  }
-  
-  export type AuthStore = AuthState & AuthActions;
+export type AuthStore = AuthState & AuthActions;

@@ -1,113 +1,96 @@
-// welcomeScreen.tsx
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
-  Animated,
+  SafeAreaView,
 } from 'react-native';
 
-// import React, { useState, useEffect } from 'react';
-// import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
-// import { jwtDecode } from 'jwt-decode';
-// import type { User } from '../types';
-
 export default function WelcomeScreen() {
-  const fadeAnim = new Animated.Value(0);
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  const handleGoogleSignIn = async () => {
-    console.log('Google sign-in clicked');
+  const handleGmailLogin = () => {
+    console.log('Gmail login pressed!');
+    // TODO: Implement Google OAuth login
   };
 
   return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>Just ask</Text>
-          <Text style={styles.subtitle}>audience</Text>
-          <Text style={styles.subtitle}>fans</Text>
-          <Text style={styles.subtitle}>subscribers</Text>
-          <Text style={styles.subtitle}>friends</Text>
-          <Text style={styles.subtitle}>classmates....</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        {/* Main heading */}
+        <View style={styles.headerSection}>
+          <Text style={styles.mainTitle}>Just Ask</Text>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.description}>audience</Text>
+            <Text style={styles.description}>fans</Text>
+            <Text style={styles.description}>subscribers</Text>
+            <Text style={styles.description}>friends</Text>
+            <Text style={styles.description}>classmates ...</Text>
+          </View>
         </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.googleButton}
-            onPress={handleGoogleSignIn}
-          >
-            <Text style={styles.googleButtonText}>login gmail</Text>
+        {/* Login section */}
+        <View style={styles.loginSection}>
+          <TouchableOpacity style={styles.gmailButton} onPress={handleGmailLogin}>
+            <Text style={styles.gmailButtonText}>login gmail</Text>
           </TouchableOpacity>
         </View>
-      </Animated.View>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
+    paddingHorizontal: 30,
+    paddingVertical: 40,
+    justifyContent: 'space-between',
+  },
+  headerSection: {
+    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
+    alignItems: 'flex-start',
   },
-  textContainer: {
-    alignItems: 'center',
-    marginBottom: 60,
-  },
-  title: {
-    fontSize: 48,
+  mainTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 10,
+    color: '#333333',
+    marginBottom: 30,
   },
-  subtitle: {
-    fontSize: 32,
-    fontWeight: '600',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 5,
+  descriptionContainer: {
+    alignItems: 'flex-start',
   },
-  buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
+  description: {
+    fontSize: 18,
+    color: '#666666',
+    marginBottom: 8,
+    lineHeight: 24,
   },
-  googleButton: {
-    backgroundColor: 'white',
-    borderRadius: 25,
+  loginSection: {
+    paddingBottom: 50,
+  },
+  gmailButton: {
+    backgroundColor: '#4285F4',
     paddingVertical: 16,
-    paddingHorizontal: 40,
-    minWidth: 200,
+    paddingHorizontal: 32,
+    borderRadius: 8,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 2,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  googleButtonText: {
-    fontSize: 18,
+  gmailButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
-    color: '#4285F4',
   },
 });
-
