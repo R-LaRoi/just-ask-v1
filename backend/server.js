@@ -13,10 +13,11 @@ app.use(express.json()); // Allow the server to read JSON from request bodies
 
 // --- Environment Variables ---
 const uri = process.env.MONGODB_URI;
-const JWT_SECRET = process.env.JWT_SECRET; // A long, random, secret string for signing tokens
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID_WEB; // Your Web Client ID from Google Cloud
+const JWT_SECRET = process.env.JWT_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID_WEB;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET_WEB;
 
-if (!uri || !JWT_SECRET || !GOOGLE_CLIENT_ID) {
+if (!uri || !JWT_SECRET || !GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
   console.error("FATAL ERROR: Missing required environment variables.");
   process.exit(1);
 }
@@ -29,7 +30,7 @@ const mongoClient = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
+const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET);
 
 // --- The Google Authentication Endpoint ---
 app.post("/api/auth/google", async (req, res) => {

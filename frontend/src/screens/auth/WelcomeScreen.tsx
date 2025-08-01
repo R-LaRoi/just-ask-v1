@@ -23,28 +23,37 @@ const discovery = {
 };
 
 const getClientId = () => {
-  if (Platform.OS === 'ios') {
-    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS;
-  } else {
-    // Web/Android fallback
-    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
-  }
+  const clientId = Platform.OS === 'ios'
+    ? process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS
+    : process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
+
+  console.log(`Using ${Platform.OS} client ID:`, clientId);
+  return clientId;
 };
 
 export default function WelcomeScreen() {
   const { signInWithGoogle, isLoading } = useAuthStore();
 
-  // Set up Google OAuth request with proper PKCE configuration
+  // Add this to see what redirect URI is being generated
+  const redirectUri = makeRedirectUri({
+    scheme: 'just-ask-v1',
+    path: 'auth',
+  });
+  
+  console.log('Generated redirect URI:', redirectUri);
+
+  // Set up Google OAuth request with web-optimized redirect configuration
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: getClientId(),
       scopes: ['openid', 'profile', 'email'],
       responseType: 'code',
-      redirectUri: makeRedirectUri({
-        scheme: 'just-ask-v1',
-        path: 'auth',
-      }),
-      usePKCE: true,
+      redirectUri: redirectUri,
+      usePKCE: false, // Changed from true to false
+      // Additional web-specific configuration
+      extraParams: Platform.OS === 'web' ? {
+        prompt: 'select_account', // Always show account selection on web
+      } : {},
     },
     discovery
   );
@@ -54,9 +63,14 @@ export default function WelcomeScreen() {
       console.log('OAuth request not ready');
       return;
     }
-    
+
     try {
-      await signInWithGoogle(promptAsync);
+      // For web, this will use redirect instead of popup
+      const promptOptions = Platform.OS === 'web' ? {
+        showInRecents: false,
+      } : {};
+
+      await signInWithGoogle(() => promptAsync(promptOptions));
     } catch (error) {
       console.error('Login error:', error);
     }
@@ -79,8 +93,8 @@ export default function WelcomeScreen() {
 
         {/* Login section */}
         <View style={styles.loginSection}>
-          <TouchableOpacity 
-            style={[styles.gmailButton, isLoading && styles.gmailButtonDisabled]} 
+          <TouchableOpacity
+            style={[styles.gmailButton, isLoading && styles.gmailButtonDisabled]}
             onPress={handleGmailLogin}
             disabled={isLoading || !request}
           >
