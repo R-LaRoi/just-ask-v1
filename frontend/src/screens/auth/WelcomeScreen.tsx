@@ -5,12 +5,61 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
+import { useAuthRequest, makeRedirectUri } from 'expo-auth-session';
+import * as WebBrowser from 'expo-web-browser';
+import { useAuthStore } from '../../stores/authStore';
+
+// Required for expo-auth-session to work properly
+WebBrowser.maybeCompleteAuthSession();
+
+// Google OAuth discovery document
+const discovery = {
+  authorizationEndpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+  tokenEndpoint: 'https://www.googleapis.com/oauth2/v4/token',
+  revocationEndpoint: 'https://oauth2.googleapis.com/revoke',
+};
+
+const getClientId = () => {
+  if (Platform.OS === 'ios') {
+    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID_IOS;
+  } else {
+    // Web/Android fallback
+    return process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
+  }
+};
 
 export default function WelcomeScreen() {
-  const handleGmailLogin = () => {
-    console.log('Gmail login pressed!');
-    // TODO: Implement Google OAuth login
+  const { signInWithGoogle, isLoading } = useAuthStore();
+
+  // Set up Google OAuth request with proper PKCE configuration
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: getClientId(),
+      scopes: ['openid', 'profile', 'email'],
+      responseType: 'code',
+      redirectUri: makeRedirectUri({
+        scheme: 'just-ask-v1',
+        path: 'auth',
+      }),
+      usePKCE: true,
+    },
+    discovery
+  );
+
+  const handleGmailLogin = async () => {
+    if (!request) {
+      console.log('OAuth request not ready');
+      return;
+    }
+    
+    try {
+      await signInWithGoogle(promptAsync);
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -30,8 +79,16 @@ export default function WelcomeScreen() {
 
         {/* Login section */}
         <View style={styles.loginSection}>
-          <TouchableOpacity style={styles.gmailButton} onPress={handleGmailLogin}>
-            <Text style={styles.gmailButtonText}>login gmail</Text>
+          <TouchableOpacity 
+            style={[styles.gmailButton, isLoading && styles.gmailButtonDisabled]} 
+            onPress={handleGmailLogin}
+            disabled={isLoading || !request}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={styles.gmailButtonText}>login gmail</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -92,5 +149,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  gmailButtonDisabled: {
+    opacity: 0.6,
   },
 });

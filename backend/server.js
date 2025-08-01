@@ -34,14 +34,20 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 // --- The Google Authentication Endpoint ---
 app.post("/api/auth/google", async (req, res) => {
   try {
-    const { token } = req.body; // The idToken from the app
-    if (!token) {
-      return res.status(400).json({ message: "ID token is required." });
+    const { code, redirectUri } = req.body;
+    if (!code) {
+      return res.status(400).json({ message: "Authorization code is required." });
     }
 
-    // 1. Verify the Google ID token
+    // Exchange authorization code for tokens
+    const { tokens } = await googleClient.getToken({
+      code,
+      redirect_uri: redirectUri,
+    });
+
+    // Verify the ID token
     const ticket = await googleClient.verifyIdToken({
-      idToken: token,
+      idToken: tokens.id_token,
       audience: GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
