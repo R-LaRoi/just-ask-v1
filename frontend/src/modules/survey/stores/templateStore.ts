@@ -70,7 +70,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     const { currentSurvey } = get();
     if (currentSurvey) {
       const updatedResponses = currentSurvey.responses.filter(r => r.questionId !== questionId);
-      updatedResponses.push({ questionId, answer });
+      updatedResponses.push({ questionId, answer, answeredAt: new Date() });
       
       set({
         currentSurvey: {

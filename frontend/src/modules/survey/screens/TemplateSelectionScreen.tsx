@@ -41,9 +41,7 @@ const TemplateSelectionScreen: React.FC = () => {
     }
 
     createSurveyFromTemplate(selectedTemplateId);
-
-    // Navigate to SurveyPreview (we'll create this next)
-    navigation.navigate('SurveyPreview' as never);
+    navigation.navigate('SurveyTaking' as never);
   };
 
   const handleStartFromScratch = () => {

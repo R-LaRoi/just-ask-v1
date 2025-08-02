@@ -7,6 +7,7 @@ import OnboardingScreen from './auth/OnboardingScreen';
 import ProfileCreatedScreen from '../screens/auth/ProfileCreatedScreen';
 import DashboardScreen from './DashboardScreen';
 import TemplateSelectionScreen from '../modules/survey/screens/TemplateSelectionScreen';
+import SurveyTakingScreen from '../modules/survey/screens/SurveyTakingScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -64,6 +65,7 @@ export default function AppNavigator() {
         <>
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
           <Stack.Screen name="TemplateSelection" component={TemplateSelectionScreen} />
+          <Stack.Screen name="SurveyTaking" component={SurveyTakingScreen} />
         </>
       )}
     </Stack.Navigator>
