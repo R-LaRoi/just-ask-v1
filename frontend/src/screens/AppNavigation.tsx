@@ -4,16 +4,18 @@ import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { useAuthStore } from '../stores/authStore';
 import WelcomeScreen from './auth/WelcomeScreen';
 import OnboardingScreen from './auth/OnboardingScreen';
+import ProfileCreatedScreen from '../screens/auth/ProfileCreatedScreen';
 // import DashboardScreen from './DashboardScreen'; // You'll create this next
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
-  const { 
-    isAuthenticated, 
-    isOnboardingComplete, 
-    isRehydrating, 
-    rehydrateAuth 
+  const {
+    isAuthenticated,
+    isOnboardingComplete,
+    isRehydrating,
+    rehydrateAuth,
+    user
   } = useAuthStore();
 
   // Check for stored auth token on app start
@@ -30,6 +32,17 @@ export default function AppNavigator() {
     );
   }
 
+  // Check if profile was just created (intermediate state)
+  const isProfileCreated = user?.profileCreated || false;
+
+  // Add debugging logs
+  console.log('Navigation Debug:', {
+    isAuthenticated,
+    isOnboardingComplete,
+    isProfileCreated,
+    user: user
+  });
+
   return (
     <Stack.Navigator
       id={undefined}
@@ -41,11 +54,17 @@ export default function AppNavigator() {
     >
       {!isAuthenticated ? (
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      ) : !isOnboardingComplete ? (
+      ) : !isOnboardingComplete && !isProfileCreated ? (
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      ) : isProfileCreated && !isOnboardingComplete ? (
+        <Stack.Screen name="ProfileCreated" component={ProfileCreatedScreen} />
       ) : (
-        // TODO: Add your main app screens here
-        <Stack.Screen name="Dashboard" component={() => <View><Text>Dashboard Coming Soon!</Text></View>} />
+        // Main app screens
+        <Stack.Screen name="Dashboard" component={() =>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Dashboard Coming Soon!</Text>
+          </View>
+        } />
       )}
     </Stack.Navigator>
   );

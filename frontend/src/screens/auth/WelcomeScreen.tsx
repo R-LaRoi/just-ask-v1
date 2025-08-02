@@ -39,7 +39,7 @@ export default function WelcomeScreen() {
     scheme: 'just-ask-v1',
     path: 'auth',
   });
-  
+
   console.log('Generated redirect URI:', redirectUri);
 
   // Set up Google OAuth request with web-optimized redirect configuration

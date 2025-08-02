@@ -2,7 +2,7 @@
 
 require("dotenv").config();
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
@@ -37,7 +37,9 @@ app.post("/api/auth/google", async (req, res) => {
   try {
     const { code, redirectUri } = req.body;
     if (!code) {
-      return res.status(400).json({ message: "Authorization code is required." });
+      return res
+        .status(400)
+        .json({ message: "Authorization code is required." });
     }
 
     // Exchange authorization code for tokens
@@ -128,6 +130,146 @@ app.post("/api/auth/google", async (req, res) => {
   }
 });
 
+// --- JWT Middleware for Protected Routes ---
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({ message: "Access token required" });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: "Invalid or expired token" });
+    }
+    req.user = user;
+    next();
+  });
+};
+
+// --- Onboarding Endpoint ---
+app.patch("/api/users/onboarding", authenticateToken, async (req, res) => {
+  console.log('Onboarding endpoint hit');
+  console.log('Request body:', req.body);
+  console.log('User ID:', req.user.userId);
+  
+  try {
+    const { name, socialHandle, gender, age, location } = req.body;
+    const userId = req.user.userId;
+
+    if (!name || !socialHandle) {
+      console.log('Missing required fields');
+      return res
+        .status(400)
+        .json({ message: "Name and social handle are required" });
+    }
+
+    console.log('Connecting to database...');
+    // Connect to the database
+    await mongoClient.connect();
+    const db = mongoClient.db("just_ask_v1");
+    const usersCollection = db.collection("users");
+
+    console.log('Updating user...');
+    // Update user with onboarding data
+    const result = await usersCollection.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      {
+        $set: {
+          name,
+          socialHandle,
+          gender: gender || null,
+          age: age ? parseInt(age) : null,
+          location: location || null,
+          profileCreated: true,
+          updatedAt: new Date(),
+        },
+      },
+      {
+        returnDocument: "after",
+      }
+    );
+
+    console.log('Update result:', result);
+
+    if (!result.value) {
+      console.log('User not found');
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log('Sending success response');
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        id: result.value._id,
+        email: result.value.email,
+        name: result.value.name,
+        socialHandle: result.value.socialHandle,
+        onboardingComplete: result.value.onboardingComplete,
+        profileCreated: result.value.profileCreated,
+      },
+    });
+  } catch (error) {
+    console.error("Onboarding error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error during onboarding" });
+  }
+});
+
+// --- Profile Creation Endpoint ---
+app.patch("/api/users/profile", authenticateToken, async (req, res) => {
+  try {
+    const { interests } = req.body;
+    const userId = req.user.userId;
+
+    if (!interests || interests.trim() === "") {
+      return res.status(400).json({ message: "Interests are required" });
+    }
+
+    // Connect to the database
+    await mongoClient.connect();
+    const db = mongoClient.db("just_ask_v1");
+    const usersCollection = db.collection("users");
+
+    // Update user with profile data
+    const result = await usersCollection.findOneAndUpdate(
+      { _id: new require("mongodb").ObjectId(userId) },
+      {
+        $set: {
+          interests: interests.trim(),
+          profileComplete: true,
+          updatedAt: new Date(),
+        },
+      },
+      {
+        returnDocument: "after",
+      }
+    );
+
+    if (!result.value) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile created successfully",
+      user: {
+        id: result.value._id,
+        email: result.value.email,
+        name: result.value.name,
+        interests: result.value.interests,
+        profileComplete: result.value.profileComplete,
+      },
+    });
+  } catch (error) {
+    console.error("Profile creation error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error during profile creation" });
+  }
+});
+
 // --- Start the server ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -139,4 +281,48 @@ app.listen(PORT, () => {
       console.log("🔌 Successfully connected to MongoDB!");
     })
     .catch(console.error);
+});
+
+// Updated Backend Profile Endpoint (without bio)
+// --- Get Current User Endpoint ---
+app.get("/api/users/me", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // Connect to the database
+    await mongoClient.connect();
+    const db = mongoClient.db("just_ask_v1");
+    const usersCollection = db.collection("users");
+
+    // Find the user by ID
+    const user = await usersCollection.findOne({
+      _id: new ObjectId(userId),
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return user data
+    res.status(200).json({
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+        socialHandle: user.socialHandle,
+        gender: user.gender,
+        age: user.age,
+        location: user.location,
+        interests: user.interests,
+        onboardingComplete: user.onboardingComplete || false,
+        profileCreated: user.profileCreated || false,
+      },
+    });
+  } catch (error) {
+    console.error("Get user error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error while fetching user data" });
+  }
 });

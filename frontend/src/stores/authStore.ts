@@ -5,12 +5,6 @@ import { AuthStore, User } from '../types/auth';
 import { AuthRequestPromptOptions, AuthSessionResult, makeRedirectUri } from 'expo-auth-session';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-// Remove these lines as we're now importing from config/env.ts
-// const API_URL = 'http://192.168.1.100:3000'; // Replace with your actual API URL
-// Then remove or comment out the existing API_URL line:
-// const API_URL = 'http://192.168.1.100:3000';
-
 export const useAuthStore = create<AuthStore>((set) => ({
   // --- STATE ---
   user: null,
@@ -31,7 +25,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       // 1. Show the Google login prompt to the user
       const result = await promptAsync();
-  
+
       // 2. Check if the login was successful and we received an authorization code
       if (result.type === 'success' && result.params.code) {
         const { code } = result.params;
@@ -49,18 +43,18 @@ export const useAuthStore = create<AuthStore>((set) => ({
             })
           }),
         });
-  
+
         if (!backendResponse.ok) {
           const errorData = await backendResponse.json();
           throw new Error(errorData.message || 'Authentication with backend failed.');
         }
-  
+
         // 4. Get our own app token (JWT) and user data from the backend
         const { token, user } = await backendResponse.json();
-  
+
         // 5. Store our app token securely on the device for session persistence
         await AsyncStorage.setItem('authToken', token);
-  
+
         // 6. Update the app state to reflect the successful login
         set({
           user,
@@ -105,7 +99,37 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const token = await AsyncStorage.getItem('authToken');
       console.log('Token from storage:', token ? 'exists' : 'null');
       if (token) {
+        // First set the token
         set({ authToken: token, isAuthenticated: true });
+        
+        // Then fetch the user data from the backend
+        const API_URL = process.env.EXPO_PUBLIC_API_URL;
+        try {
+          const response = await fetch(`${API_URL}/api/users/me`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            console.log('User data fetched:', userData);
+            set({ 
+              user: userData,
+              isOnboardingComplete: userData.onboardingComplete || false
+            });
+          } else {
+            console.log('Failed to fetch user data, token might be invalid');
+            // Token is invalid, clear it
+            await AsyncStorage.removeItem('authToken');
+            set({ authToken: null, isAuthenticated: false });
+          }
+        } catch (fetchError) {
+          console.error('Error fetching user data:', fetchError);
+          // Keep the user logged in but without user data for now
+        }
       }
     } catch (e) {
       console.error("Failed to rehydrate auth token from storage", e);
@@ -121,5 +145,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
    */
   setOnboardingComplete: (complete: boolean) => {
     set({ isOnboardingComplete: complete });
+  },
+
+  /**
+   * Updates the profile created status in the user state.
+   */
+  setProfileCreated: (created: boolean) => {
+    set((state) => ({
+      ...state,
+      user: state.user ? { ...state.user, profileCreated: created } : null
+    }));
   },
 }));

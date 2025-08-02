@@ -23,10 +23,10 @@ type FormData = {
   location: string;
 };
 
-const API_URL = 'http://192.168.1.100:3000'; // <-- IMPORTANT: Use the same IP as your authStore
+const API_URL = 'http://localhost:3000'; // Change from 192.168.1.100
 
-export default function OnboardingScreen() {
-  const { user, authToken, setOnboardingComplete } = useAuthStore();
+export default function OnboardingScreen({ navigation }: any) {
+  const { user, authToken, setProfileCreated } = useAuthStore(); // Add setProfileCreated
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
@@ -45,30 +45,47 @@ export default function OnboardingScreen() {
       Alert.alert('Error', 'You are not authenticated.');
       return;
     }
+
+    console.log('Starting onboarding submission...', data);
+    console.log('Auth token:', authToken ? 'Present' : 'Missing');
+    console.log('API URL:', `${API_URL}/api/users/onboarding`);
+
     setIsSubmitting(true);
     try {
+      console.log('Making API request...');
       const response = await fetch(`${API_URL}/api/users/onboarding`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`, // Send the JWT for authentication
+          'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify(data),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Error response:', errorData);
         throw new Error(errorData.message || 'Failed to update profile.');
       }
 
-      // Success!
-      Alert.alert('Profile Updated!', 'Welcome to the app!');
-      setOnboardingComplete(true); // This will trigger navigation to the HomeScreen
+      const responseData = await response.json();
+      console.log('Success response:', responseData);
+
+      // Success! Navigate to confirmation screen
+      console.log('Setting profile created to true...');
+      setProfileCreated(true); // Set flag to show confirmation screen
+      console.log('Profile created flag set successfully');
 
     } catch (error) {
+      console.error('Submission error:', error);
       Alert.alert('Submission Error', error.message);
     } finally {
+      console.log('Setting isSubmitting to false...');
       setIsSubmitting(false);
+      console.log('isSubmitting set to false');
     }
   };
 
@@ -89,6 +106,8 @@ export default function OnboardingScreen() {
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
+            nativeID="name"
+            accessibilityLabel="Name"
           />
         )}
       />
@@ -100,6 +119,8 @@ export default function OnboardingScreen() {
         style={[styles.input, styles.disabledInput]}
         value={user?.email}
         editable={false}
+        nativeID="email"
+        accessibilityLabel="Email"
       />
 
       {/* Social Handle Input */}
@@ -115,6 +136,8 @@ export default function OnboardingScreen() {
             onChangeText={onChange}
             value={value}
             autoCapitalize="none"
+            nativeID="socialHandle"
+            accessibilityLabel="Social Handle"
           />
         )}
       />
@@ -122,13 +145,50 @@ export default function OnboardingScreen() {
 
       {/* Other Fields */}
       <Text style={styles.label}>Gender (Optional)</Text>
-      <Controller name="gender" control={control} render={({ field: { onChange, value } }) => <TextInput style={styles.input} onChangeText={onChange} value={value} />} />
+      <Controller
+        name="gender"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <TextInput
+            style={styles.input}
+            onChangeText={onChange}
+            value={value}
+            nativeID="gender"
+            accessibilityLabel="Gender"
+          />
+        )}
+      />
 
       <Text style={styles.label}>Age (Optional)</Text>
-      <Controller name="age" control={control} render={({ field: { onChange, value } }) => <TextInput style={styles.input} onChangeText={onChange} value={value} keyboardType="number-pad" />} />
+      <Controller
+        name="age"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <TextInput
+            style={styles.input}
+            onChangeText={onChange}
+            value={value}
+            keyboardType="number-pad"
+            nativeID="age"
+            accessibilityLabel="Age"
+          />
+        )}
+      />
 
       <Text style={styles.label}>Location (Optional)</Text>
-      <Controller name="location" control={control} render={({ field: { onChange, value } }) => <TextInput style={styles.input} onChangeText={onChange} value={value} />} />
+      <Controller
+        name="location"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <TextInput
+            style={styles.input}
+            onChangeText={onChange}
+            value={value}
+            nativeID="location"
+            accessibilityLabel="Location"
+          />
+        )}
+      />
 
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>

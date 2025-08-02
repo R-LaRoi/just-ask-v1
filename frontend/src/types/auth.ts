@@ -6,9 +6,10 @@ export interface User {
     name: string;
     picture?: string;
     platform?: string;
-    bio?: string;
+  
     onboardingComplete: boolean;
-  }
+    profileCreated?: boolean;
+}
   
 export interface AuthState {
   user: User | null;
@@ -24,6 +25,7 @@ export interface AuthActions {
   signOut: () => Promise<void>;
   rehydrateAuth: () => Promise<void>;
   setOnboardingComplete: (complete: boolean) => void;
+  setProfileCreated: (created: boolean) => void;
 }
   
 export type AuthStore = AuthState & AuthActions;
