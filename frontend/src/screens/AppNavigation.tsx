@@ -5,7 +5,8 @@ import { useAuthStore } from '../stores/authStore';
 import WelcomeScreen from './auth/WelcomeScreen';
 import OnboardingScreen from './auth/OnboardingScreen';
 import ProfileCreatedScreen from '../screens/auth/ProfileCreatedScreen';
-// import DashboardScreen from './DashboardScreen'; // You'll create this next
+import DashboardScreen from './DashboardScreen';
+import TemplateSelectionScreen from '../modules/survey/screens/TemplateSelectionScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -60,11 +61,10 @@ export default function AppNavigator() {
         <Stack.Screen name="ProfileCreated" component={ProfileCreatedScreen} />
       ) : (
         // Main app screens
-        <Stack.Screen name="Dashboard" component={() =>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Dashboard Coming Soon!</Text>
-          </View>
-        } />
+        <>
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="TemplateSelection" component={TemplateSelectionScreen} />
+        </>
       )}
     </Stack.Navigator>
   );
