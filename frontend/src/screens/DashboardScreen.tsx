@@ -8,13 +8,15 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuthStore } from '../stores/authStore';
+import { RootStackParamList } from '../types/navigation';
 
-interface DashboardScreenProps {
-  navigation: any;
-}
+type DashboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Dashboard'>;
 
-export default function DashboardScreen({ navigation }: DashboardScreenProps) {
+export default function DashboardScreen() {
+  const navigation = useNavigation<DashboardScreenNavigationProp>();
   const { user, signOut: logout } = useAuthStore();
 
   const handleSignOut = () => {
@@ -29,7 +31,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
   };
 
   const handleStartWithTemplate = () => {
-    navigation.navigate('TemplateSelection');
+    navigation.navigate('SurveyEditor');
   };
 
   const handleAudienceInsights = () => {

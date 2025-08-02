@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuthStore } from '../stores/authStore';
+import { RootStackParamList } from '../types/navigation';
 import WelcomeScreen from './auth/WelcomeScreen';
 import OnboardingScreen from './auth/OnboardingScreen';
 import ProfileCreatedScreen from '../screens/auth/ProfileCreatedScreen';
 import DashboardScreen from './DashboardScreen';
-import TemplateSelectionScreen from '../modules/survey/screens/TemplateSelectionScreen';
 import SurveyTakingScreen from '../modules/survey/screens/SurveyTakingScreen';
+import SurveyEditorScreen from '../modules/survey/screens/SurveyEditorScreen';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
   const {
@@ -64,7 +65,9 @@ export default function AppNavigator() {
         // Main app screens
         <>
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
-          <Stack.Screen name="TemplateSelection" component={TemplateSelectionScreen} />
+          {/* Remove this line: */}
+          {/* <Stack.Screen name="TemplateSelection" component={TemplateSelectionScreen} /> */}
+          <Stack.Screen name="SurveyEditor" component={SurveyEditorScreen} />
           <Stack.Screen name="SurveyTaking" component={SurveyTakingScreen} />
         </>
       )}

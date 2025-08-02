@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,13 +12,18 @@ import { useNavigation } from '@react-navigation/native';
 import { useTemplateStore } from '../stores/templateStore';
 import TemplateCard from '../components/TemplateCard';
 import { SurveyTemplate } from '../types/survey';
+import { RootStackParamList } from '../../../types/navigation';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+type TemplateSelectionScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'TemplateSelection'>;
 
-const TemplateSelectionScreen: React.FC = () => {
-  const navigation = useNavigation();
+
+
+
+export default function TemplateSelectionScreen() {
+  const navigation = useNavigation<TemplateSelectionScreenNavigationProp>();
   const {
     templates,
     selectTemplate,
-    createSurveyFromTemplate,
     error,
     resetError
   } = useTemplateStore();
@@ -40,19 +45,15 @@ const TemplateSelectionScreen: React.FC = () => {
       return;
     }
 
-    createSurveyFromTemplate(selectedTemplateId);
-    navigation.navigate('SurveyTaking' as never);
+    const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+    navigation.navigate('SurveyEditor', { template: selectedTemplate });
   };
 
   const handleStartFromScratch = () => {
-    Alert.alert(
-      'Coming Soon!',
-      'Custom survey builder will be available in the next update.',
-      [{ text: 'OK' }]
-    );
+    navigation.navigate('SurveyEditor');
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       Alert.alert('Error', error, [
         { text: 'OK', onPress: resetError }
@@ -118,7 +119,7 @@ const TemplateSelectionScreen: React.FC = () => {
       )}
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 24,
-    paddingBottom: 100, // Space for footer
+    paddingBottom: 100,
   },
   customButton: {
     backgroundColor: '#ffffff',
@@ -211,5 +212,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
-export default TemplateSelectionScreen;
