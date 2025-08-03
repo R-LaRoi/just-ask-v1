@@ -160,9 +160,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
   
   deleteQuestion: (questionId) => {
+    console.log('🗑️ editorStore deleteQuestion called with:', questionId);
     const { editingTemplate } = get();
     if (editingTemplate) {
+      console.log('📋 Current questions:', editingTemplate.questions.map(q => q.id));
       const updatedQuestions = editingTemplate.questions.filter(q => q.id !== questionId);
+      console.log('📋 Updated questions:', updatedQuestions.map(q => q.id));
       set({
         editingTemplate: {
           ...editingTemplate,
@@ -170,6 +173,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
           questionCount: updatedQuestions.length
         }
       });
+      console.log('✅ Question deleted successfully');
+    } else {
+      console.log('❌ No editing template found');
     }
   },
   

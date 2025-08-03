@@ -16,23 +16,23 @@ interface QuestionEditorProps {
   question: Question;
   questionIndex: number;
   isLast?: boolean;
-  useEditorStore?: boolean; // New prop to determine which store to use
+  useEditorStore?: boolean;
 }
 
 export default function QuestionEditor({ question, questionIndex, isLast, useEditorStore: useEditorStoreProp }: QuestionEditorProps) {
-  // Use surveyEditorStore functions
   const {
     updateQuestionText: updateQuestionTextSurvey,
     addOption: addOptionSurvey,
     removeOption: removeOptionSurvey,
     reorderOptions: reorderOptionsSurvey,
+    deleteQuestion: deleteQuestionSurvey,
   } = useSurveyEditorStore();
 
-  // Use editorStore functions
   const {
     updateQuestion,
     addOption: addOptionEditor,
     deleteOption,
+    deleteQuestion: deleteQuestionEditor,
     reorderOptions: reorderOptionsEditor,
   } = useEditorStore();
 
@@ -98,8 +98,37 @@ export default function QuestionEditor({ question, questionIndex, isLast, useEdi
       }
     } else {
       console.log('❌ Cannot remove option - minimum 2 options required');
-      // You can still use Alert for this error message or replace with console.log
       console.log('⚠️ Questions must have at least 2 options.');
+    }
+  };
+
+  const handleDeleteQuestion = () => {
+    console.log('🗑️ QuestionEditor handleDeleteQuestion called:', {
+      questionId: question.id,
+      questionTitle: question.title,
+      useEditorStoreProp,
+      questionIndex
+    });
+    
+    // TEMPORARY: Skip Alert and directly call delete for testing
+    console.log('🔥 Bypassing Alert - directly calling delete...');
+    console.log('🔍 Store functions available:', {
+      deleteQuestionEditor: typeof deleteQuestionEditor,
+      deleteQuestionSurvey: typeof deleteQuestionSurvey
+    });
+    
+    try {
+      if (useEditorStoreProp) {
+        console.log('📝 Using editorStore deleteQuestionEditor with questionId:', question.id);
+        deleteQuestionEditor(question.id);
+        console.log('✅ deleteQuestionEditor called successfully');
+      } else {
+        console.log('📝 Using surveyEditorStore deleteQuestionSurvey with questionId:', question.id);
+        deleteQuestionSurvey(question.id);
+        console.log('✅ deleteQuestionSurvey called successfully');
+      }
+    } catch (error) {
+      console.error('❌ Error in delete operation:', error);
     }
   };
 
@@ -117,6 +146,15 @@ export default function QuestionEditor({ question, questionIndex, isLast, useEdi
             <Text style={styles.requiredBadge}>Required</Text>
           )}
         </View>
+
+        {/* Delete Button */}
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDeleteQuestion}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.deleteButtonText}>🗑️</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Question Title */}
@@ -280,6 +318,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+  },
+  deleteButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FEF2F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  deleteButtonText: {
+    fontSize: 16,
   },
   titleContainer: {
     marginBottom: 20,

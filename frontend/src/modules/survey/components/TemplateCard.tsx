@@ -24,8 +24,8 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
 }) => {
   const gradients = {
     'know-my-audience': ['#667eea', '#764ba2'],
-    'content-feedback': ['#f093fb', '#f5576c'],
-    'poll': ['#4facfe', '#00f2fe']
+    'product-feedback': ['#f093fb', '#f5576c'],
+    'feature-feedback': ['#4facfe', '#00f2fe']
   };
 
   const gradient = gradients[template.id as keyof typeof gradients] || ['#667eea', '#764ba2'];

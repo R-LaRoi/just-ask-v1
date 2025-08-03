@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { SurveyTemplate, Question } from '../types/survey';
 
+// Add deleteQuestion to the interface (around line 26)
 interface SurveyEditorState {
   // Editor State
   surveyId: string;
@@ -29,6 +30,7 @@ interface SurveyEditorState {
   removeOption: (questionId: number, optionId: string) => void;
   updateOption: (questionId: number, optionId: string, text: string) => void;
   reorderOptions: (questionId: number, fromIndex: number, toIndex: number) => void;
+  deleteQuestion: (questionId: number) => void; // Add this line
   
   // Demo Mode Actions
   startDemo: () => void;
@@ -80,6 +82,7 @@ const DEFAULT_TEMPLATE: SurveyTemplate = {
   ]
 };
 
+// Add the deleteQuestion implementation (around line 180)
 export const useSurveyEditorStore = create<SurveyEditorState>((set, get) => ({
   // Initial State
   surveyId: '',
@@ -288,5 +291,23 @@ export const useSurveyEditorStore = create<SurveyEditorState>((set, get) => ({
   saveSurvey: () => {
     // Implementation for saving survey
     console.log('Survey saved:', get().exportSurvey());
-  }
+  },
+  
+  deleteQuestion: (questionId) => {
+    console.log('🗑️ surveyEditorStore deleteQuestion called with:', questionId);
+    const { questions } = get();
+    console.log('📋 Current questions before delete:', questions.map(q => ({ id: q.id, title: q.title })));
+    
+    const updatedQuestions = questions.filter(q => q.id !== questionId);
+    console.log('📋 Updated questions after filter:', updatedQuestions.map(q => ({ id: q.id, title: q.title })));
+    
+    set({ 
+      questions: updatedQuestions,
+      editingQuestionId: null,
+      editingOptionId: null 
+    });
+    
+    console.log('✅ surveyEditorStore deleteQuestion completed');
+    get().resetDemo();
+  },
 }));

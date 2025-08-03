@@ -37,6 +37,8 @@ export default function SurveyEditorScreen() {
     loadTemplate,
     updateTemplateTitle,
     updateTemplateDescription,
+    addQuestion,
+    deleteQuestion,
     startDemo,
     stopDemo,
     saveTemplate
@@ -300,6 +302,7 @@ export default function SurveyEditorScreen() {
           <View style={styles.questionTypeModal}>
             <Text style={styles.modalTitle}>Add Question</Text>
 
+            // Fix the modal onPress handler (around line 313)
             {[
               { type: 'multiple_choice', icon: '☑️', title: 'Multiple Choice', desc: 'Single or multiple selection' },
               { type: 'text_input', icon: '📝', title: 'Text Input', desc: 'Short or long text response' },
@@ -312,7 +315,7 @@ export default function SurveyEditorScreen() {
                 key={questionType.type}
                 style={styles.questionTypeOption}
                 onPress={() => {
-                  // addQuestion(questionType.type as Question['type']);
+                  addQuestion(questionType.type as Question['type']);
                   setShowQuestionTypes(false);
                 }}
               >
