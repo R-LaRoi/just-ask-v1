@@ -9,10 +9,10 @@ import {
   Share,
   Dimensions,
 } from 'react-native';
-// Remove this line temporarily if causing issues:
-// import * as Clipboard from 'expo-clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SurveyTemplate } from '../../types/survey';
+import DemoPreview from './DemoPreview';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +24,7 @@ interface SurveyReviewProps {
 
 export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
   const [shareUrl] = useState(`https://justask.app/survey/${template.id}`);
   const [qrCodeUrl] = useState(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`);
 
@@ -208,30 +209,62 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
         </View>
       </ScrollView>
 
-      {/* Bottom Action Bar */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={styles.editBottomButton}
-          onPress={onEdit}
-        >
-          <Text style={styles.editBottomButtonText}>✏️ Edit Survey</Text>
-        </TouchableOpacity>
+      if (showDemo) {
+        return (
+          <View style={styles.container}>
+            <View style={styles.demoHeader}>
+              <TouchableOpacity
+                style={styles.backToDemoButton}
+                onPress={() => setShowDemo(false)}
+              >
+                <Text style={styles.backToDemoButtonText}>← Back to Review</Text>
+              </TouchableOpacity>
+              <Text style={styles.demoTitle}>Survey Demo</Text>
+            </View>
+            <DemoPreview
+              template={template}
+              onComplete={handleDemoComplete}
+              useEditorStore={false}
+            />
+          </View>
+        );
+      }
 
-        <TouchableOpacity
-          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
-          onPress={handleSave}
-          disabled={isSaving}
-        >
-          <LinearGradient
-            colors={isSaving ? ['#9CA3AF', '#6B7280'] : ['#667eea', '#764ba2']}
-            style={styles.saveButtonGradient}
-          >
-            <Text style={styles.saveButtonText}>
-              {isSaving ? '💾 Saving...' : '🚀 Save & Publish'}
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+      return (
+        <View style={styles.container}>
+          {/* Bottom Action Bar */}
+          <View style={styles.bottomBar}>
+            <TouchableOpacity
+              style={styles.editBottomButton}
+              onPress={onEdit}
+            >
+              <Text style={styles.editBottomButtonText}>✏️ Edit Survey</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.demoBottomButton}
+              onPress={handleStartDemo}
+            >
+              <Text style={styles.demoBottomButtonText}>▶️ Test Demo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+              onPress={handleSave}
+              disabled={isSaving}
+            >
+              <LinearGradient
+                colors={isSaving ? ['#9CA3AF', '#6B7280'] : ['#667eea', '#764ba2']}
+                style={styles.saveButtonGradient}
+              >
+                <Text style={styles.saveButtonText}>
+                  {isSaving ? '💾 Saving...' : '🚀 Save & Publish'}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
     </View>
   );
 }

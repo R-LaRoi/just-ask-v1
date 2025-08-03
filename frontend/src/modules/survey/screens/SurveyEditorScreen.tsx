@@ -236,6 +236,7 @@ export default function SurveyEditorScreen() {
                   question={question}
                   questionIndex={index}
                   isLast={index === editingTemplate.questions.length - 1}
+                  useEditorStore={true}
                 />
               ))}
 
@@ -256,6 +257,7 @@ export default function SurveyEditorScreen() {
           <DemoPreview
             template={editingTemplate!}
             onComplete={() => handleStepChange('review')}
+            useEditorStore={true}
           />
         );
 

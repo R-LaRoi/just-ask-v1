@@ -2,6 +2,25 @@ import { SurveyTemplate } from '../types/survey';
 
 export const SURVEY_TEMPLATES: SurveyTemplate[] = [
   {
+    id: 'feature-feedback',
+    title: 'Poll',
+    description: '1 question • 30 sec',
+    completionRate: '95% completion rate',
+    icon: '📊',
+    estimatedTime: '30 sec',
+    questionCount: 1,
+    questions: [
+      {
+        id: 1,
+        type: 'multiple_choice',
+        subtype: 'boolean',
+        title: 'Do you like this feature?',
+        options: ['Yes', 'No'],
+        required: true
+      }
+    ]
+  },
+  {
     id: 'know-my-audience',
     title: 'Know My Audience',
     description: '3 questions • 2 min',

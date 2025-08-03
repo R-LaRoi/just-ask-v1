@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useSurveyEditorStore } from '../../stores/surveyEditorStore';
+import { useEditorStore } from '../../stores/editorStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SurveyTemplate } from '../../types/survey';
 
@@ -17,59 +18,118 @@ const { width } = Dimensions.get('window');
 interface DemoPreviewProps {
   template: SurveyTemplate;
   onComplete: () => void;
+  useEditorStore?: boolean; // New prop to determine which store to use
 }
 
-export default function DemoPreview({ template, onComplete }: DemoPreviewProps) {
-  const {
-    demoMode,
-    answerDemoQuestion,
-    nextDemoQuestion,
-    completeDemo,
-  } = useSurveyEditorStore();
-  
-  // Use template.questions instead of questions from store
-  const questions = template.questions;
-  const currentQuestion = questions[demoMode.currentQuestionIndex];
-  const progress = ((demoMode.currentQuestionIndex + 1) / questions.length) * 100;
-  const currentAnswer = demoMode.answers.find(a => a.questionId === currentQuestion?.id);
-  
+export default function DemoPreview({ template, onComplete, useEditorStore: useEditorStoreProp = false }: DemoPreviewProps) {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<{ questionId: number; optionId: string }[]>([]);
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  // Use the appropriate store based on the prop
+  const surveyEditorStore = useSurveyEditorStore();
+  const editorStore = useEditorStore();
+
+  // Get questions from the appropriate store instead of static template
+  const questions = useEditorStoreProp 
+    ? editorStore.editingTemplate?.questions || template.questions
+    : surveyEditorStore.questions.length > 0 ? surveyEditorStore.questions : template.questions;
+    
+  const currentQuestion = questions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+  const currentAnswer = answers.find(a => a.questionId === currentQuestion?.id);
+
   useEffect(() => {
-    if (demoMode.isCompleted) {
-      onComplete();
+    if (isCompleted) {
+      // Show completion screen for 3 seconds before calling onComplete
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 3000);
+
+      return () => clearTimeout(timer);
     }
-  }, [demoMode.isCompleted, onComplete]);
-  
+  }, [isCompleted, onComplete]);
+
+  // Reset demo state when component mounts
+  useEffect(() => {
+    setCurrentQuestionIndex(0);
+    setAnswers([]);
+    setIsCompleted(false);
+  }, [template]);
+
   const handleOptionSelect = (optionIndex: number) => {
     if (currentQuestion) {
-      answerDemoQuestion(currentQuestion.id, optionIndex.toString());
-      
+      // Update local state
+      const newAnswer = { questionId: currentQuestion.id, optionId: optionIndex.toString() };
+      const updatedAnswers = answers.filter(a => a.questionId !== currentQuestion.id);
+      updatedAnswers.push(newAnswer);
+      setAnswers(updatedAnswers);
+
+      // Also update the appropriate store if needed
+      if (useEditorStoreProp) {
+        editorStore.updateDemoResponse(currentQuestion.id, optionIndex.toString());
+      } else {
+        surveyEditorStore.answerDemoQuestion(currentQuestion.id, optionIndex.toString());
+      }
+
       // Auto-advance after a short delay
       setTimeout(() => {
-        nextDemoQuestion();
+        const nextIndex = currentQuestionIndex + 1;
+        if (nextIndex >= questions.length) {
+          setIsCompleted(true);
+          if (useEditorStoreProp) {
+            // editorStore doesn't have completeDemo, so we just mark as completed locally
+          } else {
+            surveyEditorStore.completeDemo();
+          }
+        } else {
+          setCurrentQuestionIndex(nextIndex);
+          if (useEditorStoreProp) {
+            editorStore.nextDemoQuestion();
+          } else {
+            surveyEditorStore.nextDemoQuestion();
+          }
+        }
       }, 500);
     }
   };
-  
-  if (demoMode.isCompleted) {
+
+  if (isCompleted) {
     return (
       <View style={styles.completionContainer}>
         <LinearGradient
           colors={['#667eea', '#764ba2']}
           style={styles.completionGradient}
         >
+          {/* Demo Indicator with bright red avatar */}
+          <View style={styles.demoIndicator}>
+            <View style={styles.demoAvatar}>
+              <Text style={styles.demoAvatarText}>👤</Text>
+            </View>
+            <Text style={styles.demoLabel}>DEMO MODE</Text>
+          </View>
+
           <Text style={styles.completionIcon}>🎉</Text>
           <Text style={styles.completionTitle}>Thank you!</Text>
           <Text style={styles.completionSubtitle}>
             You've completed the survey demo
           </Text>
           <Text style={styles.completionStats}>
-            {demoMode.answers.length} of {questions.length} questions answered
+            {answers.length} of {questions.length} questions answered
           </Text>
+
+          {/* Optional: Add a manual return button */}
+          <TouchableOpacity
+            style={styles.returnButton}
+            onPress={onComplete}
+          >
+            <Text style={styles.returnButtonText}>Return to Editor</Text>
+          </TouchableOpacity>
         </LinearGradient>
       </View>
     );
   }
-  
+
   if (!currentQuestion) {
     return (
       <View style={styles.loadingContainer}>
@@ -77,7 +137,7 @@ export default function DemoPreview({ template, onComplete }: DemoPreviewProps) 
       </View>
     );
   }
-  
+
   return (
     <View style={styles.container}>
       {/* Progress Bar */}
@@ -91,10 +151,10 @@ export default function DemoPreview({ template, onComplete }: DemoPreviewProps) 
           />
         </View>
         <Text style={styles.progressText}>
-          {demoMode.currentQuestionIndex + 1} of {questions.length}
+          {currentQuestionIndex + 1} of {questions.length}
         </Text>
       </View>
-      
+
       {/* Question Content */}
       <ScrollView
         style={styles.content}
@@ -103,19 +163,19 @@ export default function DemoPreview({ template, onComplete }: DemoPreviewProps) 
       >
         <View style={styles.questionContainer}>
           <Text style={styles.questionTitle}>{currentQuestion.title}</Text>
-          
+
           {currentQuestion.description && (
             <Text style={styles.questionDescription}>
               {currentQuestion.description}
             </Text>
           )}
         </View>
-        
+
         {/* Options */}
         <View style={styles.optionsContainer}>
           {currentQuestion.options?.map((option, index) => {
             const isSelected = currentAnswer?.optionId === index.toString();
-            
+
             return (
               <TouchableOpacity
                 key={index}
@@ -143,7 +203,7 @@ export default function DemoPreview({ template, onComplete }: DemoPreviewProps) 
           })}
         </View>
       </ScrollView>
-      
+
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
@@ -306,5 +366,58 @@ const styles = StyleSheet.create({
     color: '#C7D2FE',
     textAlign: 'center',
     fontWeight: '500',
+  },
+  demoIndicator: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  demoAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#EF4444', // Bright red background
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  demoAvatarText: {
+    fontSize: 24,
+    color: '#FFFFFF',
+  },
+  demoLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    backgroundColor: 'rgba(239, 68, 68, 0.9)', // Semi-transparent red
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    textAlign: 'center',
+  },
+  returnButton: {
+    marginTop: 32,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  returnButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });

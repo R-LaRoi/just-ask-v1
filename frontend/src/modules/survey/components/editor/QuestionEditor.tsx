@@ -8,65 +8,101 @@ import {
   Alert,
 } from 'react-native';
 import { useSurveyEditorStore } from '../../stores/surveyEditorStore';
+import { useEditorStore } from '../../stores/editorStore';
 import { Question } from '../../types/survey';
-import OptionEditor from './OptionEditor';
+import OptionEditor from '../editor/OptionEditor';
 
 interface QuestionEditorProps {
   question: Question;
   questionIndex: number;
   isLast?: boolean;
+  useEditorStore?: boolean; // New prop to determine which store to use
 }
 
-export default function QuestionEditor({ question, questionIndex, isLast }: QuestionEditorProps) {
+export default function QuestionEditor({ question, questionIndex, isLast, useEditorStore: useEditorStoreProp }: QuestionEditorProps) {
+  // Use surveyEditorStore functions
   const {
-    updateQuestionText,
-    addOption,
-    removeOption,
-    reorderOptions,
+    updateQuestionText: updateQuestionTextSurvey,
+    addOption: addOptionSurvey,
+    removeOption: removeOptionSurvey,
+    reorderOptions: reorderOptionsSurvey,
   } = useSurveyEditorStore();
-  
+
+  // Use editorStore functions
+  const {
+    updateQuestion,
+    addOption: addOptionEditor,
+    deleteOption,
+    reorderOptions: reorderOptionsEditor,
+  } = useEditorStore();
+
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [tempTitle, setTempTitle] = useState(question.title);
   const [showAddOption, setShowAddOption] = useState(false);
   const [newOptionText, setNewOptionText] = useState('');
-  
+
   const handleTitleSave = () => {
-    updateQuestionText(question.id, tempTitle);
+    if (useEditorStoreProp) {
+      updateQuestion(question.id, { title: tempTitle });
+    } else {
+      updateQuestionTextSurvey(question.id, tempTitle);
+    }
     setIsEditingTitle(false);
   };
-  
+
   const handleTitleCancel = () => {
     setTempTitle(question.title);
     setIsEditingTitle(false);
   };
-  
+
   const handleAddOption = () => {
     if (newOptionText.trim()) {
-      addOption(question.id, newOptionText.trim());
+      if (useEditorStoreProp) {
+        addOptionEditor(question.id, newOptionText.trim());
+      } else {
+        addOptionSurvey(question.id, newOptionText.trim());
+      }
       setNewOptionText('');
       setShowAddOption(false);
     }
   };
-  
+
   const handleRemoveOption = (optionIndex: number) => {
+    console.log('🗑️ QuestionEditor handleRemoveOption called:', {
+      optionIndex,
+      questionId: question.id,
+      optionsLength: question.options?.length,
+      useEditorStoreProp,
+      optionToRemove: question.options?.[optionIndex]
+    });
+
     if (question.options && question.options.length > 2) {
-      Alert.alert(
-        'Remove Option',
-        `Are you sure you want to remove "${question.options[optionIndex]}"?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Remove',
-            style: 'destructive',
-            onPress: () => removeOption(question.id, optionIndex.toString())
-          }
-        ]
-      );
+      console.log('🔄 Performing direct deletion (no confirmation)');
+
+      if (useEditorStoreProp) {
+        console.log('📝 Using editorStore deleteOption');
+        try {
+          deleteOption(question.id, optionIndex);
+          console.log('✅ deleteOption called successfully');
+        } catch (error) {
+          console.error('❌ Error calling deleteOption:', error);
+        }
+      } else {
+        console.log('📝 Using surveyEditorStore removeOption');
+        try {
+          removeOptionSurvey(question.id, optionIndex.toString());
+          console.log('✅ removeOptionSurvey called successfully');
+        } catch (error) {
+          console.error('❌ Error calling removeOptionSurvey:', error);
+        }
+      }
     } else {
-      Alert.alert('Cannot Remove', 'Questions must have at least 2 options.');
+      console.log('❌ Cannot remove option - minimum 2 options required');
+      // You can still use Alert for this error message or replace with console.log
+      console.log('⚠️ Questions must have at least 2 options.');
     }
   };
-  
+
   return (
     <View style={styles.container}>
       {/* Question Header */}
@@ -74,7 +110,7 @@ export default function QuestionEditor({ question, questionIndex, isLast }: Ques
         <View style={styles.questionNumber}>
           <Text style={styles.questionNumberText}>{questionIndex + 1}</Text>
         </View>
-        
+
         <View style={styles.questionInfo}>
           <Text style={styles.questionType}>Multiple Choice</Text>
           {question.required && (
@@ -82,7 +118,7 @@ export default function QuestionEditor({ question, questionIndex, isLast }: Ques
           )}
         </View>
       </View>
-      
+
       {/* Question Title */}
       <View style={styles.titleContainer}>
         {isEditingTitle ? (
@@ -125,11 +161,11 @@ export default function QuestionEditor({ question, questionIndex, isLast }: Ques
           </TouchableOpacity>
         )}
       </View>
-      
+
       {/* Options */}
       <View style={styles.optionsContainer}>
         <Text style={styles.optionsLabel}>Answer Options</Text>
-        
+
         {question.options?.map((option, index) => (
           <OptionEditor
             key={index}
@@ -138,9 +174,10 @@ export default function QuestionEditor({ question, questionIndex, isLast }: Ques
             questionId={question.id}
             onRemove={() => handleRemoveOption(index)}
             canRemove={(question.options?.length || 0) > 2}
+            useEditorStore={useEditorStoreProp}
           />
         ))}
-        
+
         {/* Add Option */}
         {showAddOption ? (
           <View style={styles.addOptionContainer}>

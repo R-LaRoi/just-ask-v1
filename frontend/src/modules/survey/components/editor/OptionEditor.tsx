@@ -5,10 +5,9 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  PanGestureHandler,
-  State,
 } from 'react-native';
 import { useSurveyEditorStore } from '../../stores/surveyEditorStore';
+import { useEditorStore } from '../../stores/editorStore';
 
 interface OptionEditorProps {
   option: string;
@@ -16,6 +15,7 @@ interface OptionEditorProps {
   questionId: number;
   onRemove: () => void;
   canRemove: boolean;
+  useEditorStore?: boolean;
 }
 
 export default function OptionEditor({
@@ -23,23 +23,69 @@ export default function OptionEditor({
   optionIndex,
   questionId,
   onRemove,
-  canRemove
+  canRemove,
+  useEditorStore: useEditorStoreProp
 }: OptionEditorProps) {
-  const { updateOption } = useSurveyEditorStore();
+  // Use surveyEditorStore functions
+  const { updateOption: updateOptionSurvey } = useSurveyEditorStore();
   
+  // Use editorStore functions
+  const { updateOption: updateOptionEditor } = useEditorStore();
+
   const [isEditing, setIsEditing] = useState(false);
   const [tempText, setTempText] = useState(option);
-  
+
   const handleSave = () => {
-    updateOption(questionId, optionIndex.toString(), tempText);
+    console.log('🔄 OptionEditor handleSave called:', {
+      useEditorStoreProp,
+      questionId,
+      optionIndex,
+      tempText,
+      originalOption: option
+    });
+    
+    if (useEditorStoreProp) {
+      console.log('📝 Using editorStore updateOption');
+      updateOptionEditor(questionId, optionIndex, tempText);
+    } else {
+      console.log('📝 Using surveyEditorStore updateOption');
+      updateOptionSurvey(questionId, optionIndex.toString(), tempText);
+    }
     setIsEditing(false);
   };
-  
+
   const handleCancel = () => {
+    console.log('❌ OptionEditor handleCancel called');
     setTempText(option);
     setIsEditing(false);
   };
-  
+
+  const handleRemoveClick = () => {
+    console.log('🗑️ OptionEditor trash icon clicked!', {
+      canRemove,
+      questionId,
+      optionIndex,
+      option,
+      useEditorStoreProp
+    });
+    
+    if (onRemove) {
+      console.log('✅ Calling onRemove function');
+      onRemove();
+    } else {
+      console.log('❌ onRemove function is not defined!');
+    }
+  };
+
+  console.log('🔍 OptionEditor render:', {
+    option,
+    optionIndex,
+    questionId,
+    canRemove,
+    useEditorStoreProp,
+    hasOnRemove: !!onRemove
+  });
+
   return (
     <View style={styles.container}>
       {/* Drag Handle */}
@@ -48,7 +94,7 @@ export default function OptionEditor({
         <View style={styles.dragDots} />
         <View style={styles.dragDots} />
       </View>
-      
+
       {/* Option Content */}
       <View style={styles.optionContent}>
         {isEditing ? (
@@ -82,7 +128,10 @@ export default function OptionEditor({
         ) : (
           <TouchableOpacity
             style={styles.optionDisplay}
-            onPress={() => setIsEditing(true)}
+            onPress={() => {
+              console.log('📝 Option text clicked, entering edit mode');
+              setIsEditing(true);
+            }}
             activeOpacity={0.7}
           >
             <View style={styles.optionRadio} />
@@ -90,16 +139,22 @@ export default function OptionEditor({
           </TouchableOpacity>
         )}
       </View>
-      
+
       {/* Remove Button */}
       {canRemove && (
         <TouchableOpacity
           style={styles.removeButton}
-          onPress={onRemove}
+          onPress={handleRemoveClick}
           activeOpacity={0.7}
         >
           <Text style={styles.removeButtonText}>🗑️</Text>
         </TouchableOpacity>
+      )}
+      
+      {!canRemove && (
+        <View style={styles.removeButton}>
+          <Text style={[styles.removeButtonText, { opacity: 0.3 }]}>🗑️</Text>
+        </View>
       )}
     </View>
   );

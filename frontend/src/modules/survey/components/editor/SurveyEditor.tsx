@@ -16,7 +16,7 @@ export default function SurveyEditor() {
     questions,
     updateSurveyTitle,
   } = useSurveyEditorStore();
-  
+
   return (
     <ScrollView
       style={styles.container}
@@ -36,20 +36,21 @@ export default function SurveyEditor() {
           textAlignVertical="top"
         />
       </View>
-      
+
       {/* Questions Editor */}
       <View style={styles.questionsSection}>
         <Text style={styles.sectionLabel}>Questions ({questions.length})</Text>
-        
+
         {questions.map((question, index) => (
           <QuestionEditor
             key={question.id}
             question={question}
             questionIndex={index}
+            useEditorStore={false}
           />
         ))}
       </View>
-      
+
       {/* Add Question Button */}
       <TouchableOpacity
         style={styles.addQuestionButton}
