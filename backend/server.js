@@ -270,6 +270,204 @@ app.patch("/api/users/profile", authenticateToken, async (req, res) => {
   }
 });
 
+// --- Survey Management Endpoints ---
+
+// Create/Save a new survey
+app.post("/api/surveys", authenticateToken, async (req, res) => {
+  try {
+    const { title, description, questions, estimatedTime, settings } = req.body;
+    const userId = req.user.userId;
+
+    if (!title || !questions || questions.length === 0) {
+      return res.status(400).json({ 
+        message: "Title and at least one question are required" 
+      });
+    }
+
+    await mongoClient.connect();
+    const db = mongoClient.db("just_ask_v1");
+    const surveysCollection = db.collection("surveys");
+
+    const survey = {
+      title,
+      description: description || '',
+      questions,
+      estimatedTime: estimatedTime || '2 min',
+      questionCount: questions.length,
+      settings: settings || {
+        allowBack: true,
+        showProgress: true,
+        autoSave: false
+      },
+      createdBy: new ObjectId(userId),
+      isPublished: true,
+      shareUrl: null, // Will be set after creation
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      stats: {
+        totalResponses: 0,
+        completionRate: 0,
+        averageTime: 0
+      }
+    };
+
+    const result = await surveysCollection.insertOne(survey);
+    const surveyId = result.insertedId.toString();
+    
+    // Update with share URL
+    const shareUrl = `https://justask.app/survey/${surveyId}`;
+    await surveysCollection.updateOne(
+      { _id: result.insertedId },
+      { $set: { shareUrl } }
+    );
+
+    console.log('✅ Survey created successfully:', { surveyId, title });
+
+    res.status(201).json({
+      message: "Survey created successfully",
+      surveyId,
+      shareUrl,
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`
+    });
+
+  } catch (error) {
+    console.error("Error creating survey:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Get user's surveys
+app.get("/api/surveys", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    await mongoClient.connect();
+    const db = mongoClient.db("just_ask_v1");
+    const surveysCollection = db.collection("surveys");
+
+    const surveys = await surveysCollection
+      .find({ createdBy: new ObjectId(userId) })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.json({ surveys });
+
+  } catch (error) {
+    console.error("Error fetching surveys:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Get public survey for respondents (no auth required)
+app.get("/api/surveys/:surveyId/public", async (req, res) => {
+  try {
+    const { surveyId } = req.params;
+
+    if (!ObjectId.isValid(surveyId)) {
+      return res.status(400).json({ message: "Invalid survey ID" });
+    }
+
+    await mongoClient.connect();
+    const db = mongoClient.db("just_ask_v1");
+    const surveysCollection = db.collection("surveys");
+
+    const survey = await surveysCollection.findOne({
+      _id: new ObjectId(surveyId),
+      isPublished: true
+    });
+
+    if (!survey) {
+      return res.status(404).json({ message: "Survey not found or not published" });
+    }
+
+    // Return only public data (no creator info)
+    const publicSurvey = {
+      id: survey._id,
+      title: survey.title,
+      description: survey.description,
+      questions: survey.questions,
+      estimatedTime: survey.estimatedTime,
+      questionCount: survey.questionCount,
+      settings: survey.settings
+    };
+
+    res.json({ survey: publicSurvey });
+
+  } catch (error) {
+    console.error("Error fetching public survey:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Submit survey response (no auth required)
+app.post("/api/surveys/:surveyId/responses", async (req, res) => {
+  try {
+    const { surveyId } = req.params;
+    const { responses, completedAt, timeSpent } = req.body;
+
+    if (!ObjectId.isValid(surveyId)) {
+      return res.status(400).json({ message: "Invalid survey ID" });
+    }
+
+    if (!responses || responses.length === 0) {
+      return res.status(400).json({ message: "Responses are required" });
+    }
+
+    await mongoClient.connect();
+    const db = mongoClient.db("just_ask_v1");
+    const responsesCollection = db.collection("survey_responses");
+    const surveysCollection = db.collection("surveys");
+
+    // Verify survey exists and is published
+    const survey = await surveysCollection.findOne({
+      _id: new ObjectId(surveyId),
+      isPublished: true
+    });
+
+    if (!survey) {
+      return res.status(404).json({ message: "Survey not found or not published" });
+    }
+
+    // Save response
+    const response = {
+      surveyId: new ObjectId(surveyId),
+      responses,
+      completedAt: completedAt ? new Date(completedAt) : new Date(),
+      timeSpent: timeSpent || 0,
+      submittedAt: new Date(),
+      ipAddress: req.ip || req.connection.remoteAddress
+    };
+
+    await responsesCollection.insertOne(response);
+
+    // Update survey stats
+    const totalResponses = await responsesCollection.countDocuments({
+      surveyId: new ObjectId(surveyId)
+    });
+
+    await surveysCollection.updateOne(
+      { _id: new ObjectId(surveyId) },
+      { 
+        $set: { 
+          'stats.totalResponses': totalResponses,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    console.log('✅ Survey response submitted:', { surveyId, responseCount: totalResponses });
+
+    res.status(201).json({ 
+      message: "Response submitted successfully",
+      responseId: response._id
+    });
+
+  } catch (error) {
+    console.error("Error submitting response:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 // --- Start the server ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
