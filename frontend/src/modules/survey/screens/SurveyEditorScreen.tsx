@@ -114,14 +114,7 @@ export default function SurveyEditorScreen() {
       </View>
 
       <View style={styles.headerActions}>
-        {currentStep === 'edit' && (
-          <TouchableOpacity
-            style={styles.demoButton}
-            onPress={handleStartDemo}
-          >
-            <Text style={styles.demoButtonText}>▶️ Demo</Text>
-          </TouchableOpacity>
-        )}
+        {/* Remove the demo button from edit step */}
         {currentStep === 'demo' && (
           <TouchableOpacity
             style={styles.editButton}
@@ -341,16 +334,9 @@ export default function SurveyEditorScreen() {
         </View>
       </Modal>
 
-      {/* Bottom Action Bar */}
+      {/* Bottom Action Bar - Mobile First */}
       {currentStep === 'edit' && (
         <View style={styles.bottomBar}>
-          <TouchableOpacity
-            style={styles.previewButton}
-            onPress={handleStartDemo}
-          >
-            <Text style={styles.previewButtonText}>👁️ Preview</Text>
-          </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.saveButton}
             onPress={handleSaveAndReview}
@@ -625,33 +611,27 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   bottomBar: {
-    flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    paddingBottom: 34, // Extra padding for safe area
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },
-  previewButton: {
-    flex: 1,
-    paddingVertical: 16,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  previewButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
-  },
   saveButton: {
-    flex: 1,
-    paddingVertical: 16,
+    width: '100%',
+    paddingVertical: 18,
     backgroundColor: '#667eea',
     borderRadius: 12,
     alignItems: 'center',
-    marginLeft: 8,
+    shadowColor: '#667eea',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   saveButtonText: {
     fontSize: 16,

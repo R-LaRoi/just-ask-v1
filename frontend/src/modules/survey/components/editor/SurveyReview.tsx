@@ -9,7 +9,7 @@ import {
   Share,
   Dimensions,
 } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
+// import Clipboard from '@react-native-clipboard/clipboard';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SurveyTemplate } from '../../types/survey';
 import DemoPreview from './DemoPreview';
@@ -48,7 +48,19 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
     }
   };
 
-  // Update the handleCopyLink function to use a fallback:
+  const handleStartDemo = () => {
+    setShowDemo(true);
+  };
+
+  const handleDemoComplete = () => {
+    setShowDemo(false);
+    Alert.alert(
+      'Demo Completed! 🎉',
+      'You\'ve successfully tested your survey. Ready to share it with others?',
+      [{ text: 'OK' }]
+    );
+  };
+
   const handleCopyLink = async () => {
     try {
       // Temporary fallback - you can implement proper clipboard later
@@ -124,6 +136,29 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
     );
   };
 
+  // If demo is active, show demo screen
+  if (showDemo) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.demoHeader}>
+          <TouchableOpacity
+            style={styles.backToDemoButton}
+            onPress={() => setShowDemo(false)}
+          >
+            <Text style={styles.backToDemoButtonText}>← Back to Review</Text>
+          </TouchableOpacity>
+          <Text style={styles.demoTitle}>Survey Demo</Text>
+        </View>
+        <DemoPreview
+          template={template}
+          onComplete={handleDemoComplete}
+          useEditorStore={false}
+        />
+      </View>
+    );
+  }
+
+  // Main review screen
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -209,62 +244,37 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
         </View>
       </ScrollView>
 
-      if (showDemo) {
-        return (
-          <View style={styles.container}>
-            <View style={styles.demoHeader}>
-              <TouchableOpacity
-                style={styles.backToDemoButton}
-                onPress={() => setShowDemo(false)}
-              >
-                <Text style={styles.backToDemoButtonText}>← Back to Review</Text>
-              </TouchableOpacity>
-              <Text style={styles.demoTitle}>Survey Demo</Text>
-            </View>
-            <DemoPreview
-              template={template}
-              onComplete={handleDemoComplete}
-              useEditorStore={false}
-            />
-          </View>
-        );
-      }
+      {/* Bottom Action Bar - Mobile First */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity
+          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          disabled={isSaving}
+        >
+          <LinearGradient
+            colors={isSaving ? ['#9CA3AF', '#6B7280'] : ['#667eea', '#764ba2']}
+            style={styles.saveButtonGradient}
+          >
+            <Text style={styles.saveButtonText}>
+              {isSaving ? '💾 Saving...' : '🚀 Save & Publish'}
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
 
-      return (
-        <View style={styles.container}>
-          {/* Bottom Action Bar */}
-          <View style={styles.bottomBar}>
-            <TouchableOpacity
-              style={styles.editBottomButton}
-              onPress={onEdit}
-            >
-              <Text style={styles.editBottomButtonText}>✏️ Edit Survey</Text>
-            </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.demoBottomButton}
+          onPress={handleStartDemo}
+        >
+          <Text style={styles.demoBottomButtonText}>▶️ Test Demo</Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.demoBottomButton}
-              onPress={handleStartDemo}
-            >
-              <Text style={styles.demoBottomButtonText}>▶️ Test Demo</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
-              onPress={handleSave}
-              disabled={isSaving}
-            >
-              <LinearGradient
-                colors={isSaving ? ['#9CA3AF', '#6B7280'] : ['#667eea', '#764ba2']}
-                style={styles.saveButtonGradient}
-              >
-                <Text style={styles.saveButtonText}>
-                  {isSaving ? '💾 Saving...' : '🚀 Save & Publish'}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </View>
-      );
+        <TouchableOpacity
+          style={styles.editBottomButton}
+          onPress={onEdit}
+        >
+          <Text style={styles.editBottomButtonText}>✏️ Edit Survey</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -277,6 +287,34 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  // Demo-specific styles
+  demoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  backToDemoButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    marginRight: 16,
+  },
+  backToDemoButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  demoTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  // Existing styles
   overviewSection: {
     padding: 24,
     backgroundColor: '#FFFFFF',
@@ -547,28 +585,43 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   bottomBar: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     paddingHorizontal: 24,
     paddingVertical: 16,
+    paddingBottom: 34, // Safe area padding
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
     gap: 12,
   },
   editBottomButton: {
-    flex: 1,
+    width: '100%',
     paddingVertical: 16,
     backgroundColor: '#F3F4F6',
     borderRadius: 12,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
   },
   editBottomButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#374151',
   },
+  demoBottomButton: {
+    width: '100%',
+    paddingVertical: 16,
+    backgroundColor: '#10B981',
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  demoBottomButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
   saveButton: {
-    flex: 2,
+    width: '100%',
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -576,7 +629,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonGradient: {
-    paddingVertical: 16,
+    paddingVertical: 18, // Slightly larger for primary action
     alignItems: 'center',
   },
   saveButtonText: {
