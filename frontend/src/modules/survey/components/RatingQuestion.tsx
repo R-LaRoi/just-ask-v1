@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { Question } from '../../types/survey';
+import { Question } from '../types/survey';
 
 interface RatingQuestionProps {
   question: Question;
@@ -13,46 +13,16 @@ interface RatingQuestionProps {
   onAnswer: (rating: number) => void;
 }
 
-export default function RatingQuestion({ 
-  question, 
-  rating, 
-  onAnswer 
+export default function RatingQuestion({
+  question,
+  rating,
+  onAnswer
 }: RatingQuestionProps) {
-  const isStarRating = question.subtype === 'star_rating' || !question.subtype;
-  const isNumberScale = question.subtype === 'number_scale';
-  
   const maxRating = question.maxValue || 5;
   const minRating = question.minValue || 1;
-  
+
   const handleRatingPress = (value: number) => {
     onAnswer(value);
-  };
-
-  const renderStarRating = () => {
-    return (
-      <View style={styles.starsContainer}>
-        {Array.from({ length: maxRating }, (_, index) => {
-          const starValue = index + 1;
-          const isSelected = rating !== undefined && starValue <= rating;
-          
-          return (
-            <TouchableOpacity
-              key={index}
-              style={styles.starButton}
-              onPress={() => handleRatingPress(starValue)}
-              activeOpacity={0.7}
-            >
-              <Text style={[
-                styles.star,
-                isSelected && styles.selectedStar,
-              ]}>
-                ★
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    );
   };
 
   const renderNumberScale = () => {
@@ -60,12 +30,12 @@ export default function RatingQuestion({
     for (let i = minRating; i <= maxRating; i++) {
       numbers.push(i);
     }
-    
+
     return (
       <View style={styles.numbersContainer}>
         {numbers.map((number) => {
           const isSelected = rating === number;
-          
+
           return (
             <TouchableOpacity
               key={number}
@@ -74,12 +44,13 @@ export default function RatingQuestion({
                 isSelected && styles.selectedNumberButton,
               ]}
               onPress={() => handleRatingPress(number)}
-              activeOpacity={0.7}
             >
-              <Text style={[
-                styles.numberText,
-                isSelected && styles.selectedNumberText,
-              ]}>
+              <Text
+                style={[
+                  styles.numberText,
+                  isSelected && styles.selectedNumberText,
+                ]}
+              >
                 {number}
               </Text>
             </TouchableOpacity>
@@ -91,20 +62,17 @@ export default function RatingQuestion({
 
   return (
     <View style={styles.container}>
-      {isStarRating ? renderStarRating() : renderNumberScale()}
-      
-      {rating !== undefined && (
+      {renderNumberScale()}
+
+      {rating && (
         <Text style={styles.ratingLabel}>
-          {isStarRating 
-            ? `${rating} out of ${maxRating} stars`
-            : `Rating: ${rating}`
-          }
+          Rating: {rating}/{maxRating}
         </Text>
       )}
-      
-      {question.description && (
-        <Text style={styles.helpText}>{question.description}</Text>
-      )}
+
+      <Text style={styles.helpText}>
+        {question.description || 'Select a rating from 1 to 5'}
+      </Text>
     </View>
   );
 }
@@ -113,22 +81,6 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 32,
     alignItems: 'center',
-  },
-  starsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  starButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-  },
-  star: {
-    fontSize: 40,
-    color: '#E5E7EB',
-  },
-  selectedStar: {
-    color: '#F59E0B',
   },
   numbersContainer: {
     flexDirection: 'row',

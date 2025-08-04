@@ -15,16 +15,16 @@ interface TextInputQuestionProps {
   onAnswer: (answer: string) => void;
 }
 
-export default function TextInputQuestion({ 
-  question, 
-  value = '', 
-  onAnswer 
+export default function TextInputQuestion({
+  question,
+  value = '',
+  onAnswer
 }: TextInputQuestionProps) {
   const [inputValue, setInputValue] = useState(value);
-  
+
   const isLongText = question.subtype === 'long_text';
   const isEmail = question.subtype === 'email';
-  
+
   const handleTextChange = (text: string) => {
     setInputValue(text);
     onAnswer(text);
@@ -43,7 +43,7 @@ export default function TextInputQuestion({
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
@@ -67,7 +67,7 @@ export default function TextInputQuestion({
           blurOnSubmit={!isLongText}
         />
       </View>
-      
+
       {question.description && (
         <Text style={styles.helpText}>{question.description}</Text>
       )}
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: '#F9FAFB',
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: '#667eea', // Changed from '#E5E7EB' to make it more visible
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,

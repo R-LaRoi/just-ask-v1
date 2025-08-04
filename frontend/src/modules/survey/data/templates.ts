@@ -2,7 +2,7 @@ import { SurveyTemplate } from '../types/survey';
 
 export const SURVEY_TEMPLATES: SurveyTemplate[] = [
   {
-    id: 'feature-feedback',
+    id: 'simple-poll',  // Changed from 'feature-feedback' to 'simple-poll'
     title: 'Poll',
     description: '1 question • 30 sec',
     completionRate: '95% completion rate',
@@ -64,6 +64,7 @@ export const SURVEY_TEMPLATES: SurveyTemplate[] = [
       {
         id: 1,
         type: 'rating',
+        subtype: 'star_rating',  // Add this line
         title: 'How would you rate our product overall?',
         required: true
       },
@@ -89,13 +90,14 @@ export const SURVEY_TEMPLATES: SurveyTemplate[] = [
       {
         id: 5,
         type: 'rating',
+        subtype: 'star_rating',  // Add this line
         title: 'How likely are you to recommend us to a friend?',
         required: true
       }
     ]
   },
   {
-    id: 'feature-feedback',
+    id: 'feature-feedback',  // Keep this one as is
     title: 'Feature Feedback',
     description: '5 questions • 3 min',
     completionRate: '72% completion rate',
@@ -113,12 +115,14 @@ export const SURVEY_TEMPLATES: SurveyTemplate[] = [
       {
         id: 2,
         type: 'rating',
+        subtype: 'star_rating',  // Add this line
         title: 'How easy was it to find this new feature?',
         required: true
       },
       {
         id: 3,
         type: 'rating',
+        subtype: 'star_rating',  // Add this line
         title: 'How intuitive is the feature to use?',
         required: true
       },

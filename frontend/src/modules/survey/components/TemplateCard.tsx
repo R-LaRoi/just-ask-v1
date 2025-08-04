@@ -25,7 +25,8 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
   const gradients = {
     'know-my-audience': ['#667eea', '#764ba2'],
     'product-feedback': ['#f093fb', '#f5576c'],
-    'feature-feedback': ['#4facfe', '#00f2fe']
+    'simple-poll': ['#4facfe', '#00f2fe'],  // Add this new mapping
+    'feature-feedback': ['#4facfe', '#00f2fe']  // Keep existing
   };
 
   const gradient = gradients[template.id as keyof typeof gradients] || ['#667eea', '#764ba2'];

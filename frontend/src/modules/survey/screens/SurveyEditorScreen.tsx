@@ -302,7 +302,6 @@ export default function SurveyEditorScreen() {
           <View style={styles.questionTypeModal}>
             <Text style={styles.modalTitle}>Add Question</Text>
 
-            // Fix the modal onPress handler (around line 313)
             {[
               { type: 'multiple_choice', icon: '☑️', title: 'Multiple Choice', desc: 'Single or multiple selection' },
               { type: 'text_input', icon: '📝', title: 'Text Input', desc: 'Short or long text response' },

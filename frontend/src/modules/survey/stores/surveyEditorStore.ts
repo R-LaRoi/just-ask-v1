@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { SurveyTemplate, Question } from '../types/survey';
+import { apiService } from '../../../utils/api';
 
 // Add deleteQuestion to the interface (around line 26)
 interface SurveyEditorState {
@@ -46,7 +47,7 @@ interface SurveyEditorState {
   
   // Export/Save
   exportSurvey: () => SurveyTemplate;
-  saveSurvey: () => void;
+  saveSurvey: () => Promise<any>; // Changed from () => void
 }
 
 const DEFAULT_TEMPLATE: SurveyTemplate = {
@@ -288,9 +289,35 @@ export const useSurveyEditorStore = create<SurveyEditorState>((set, get) => ({
     };
   },
   
-  saveSurvey: () => {
-    // Implementation for saving survey
-    console.log('Survey saved:', get().exportSurvey());
+  saveSurvey: async () => {
+    try {
+      const { title, questions } = get();
+      
+      if (!title || questions.length === 0) {
+        throw new Error('Title and at least one question are required');
+      }
+
+      const surveyData = {
+        title,
+        description: `${questions.length} questions • ${Math.ceil(questions.length * 0.7)} min`,
+        questions,
+        estimatedTime: `${Math.ceil(questions.length * 0.7)} min`,
+        settings: {
+          allowBack: true,
+          showProgress: true,
+          autoSave: false
+        }
+      };
+
+      console.log('🚀 Saving survey to backend...', surveyData);
+      const response = await apiService.createSurvey(surveyData);
+      console.log('✅ Survey saved successfully:', response);
+      
+      return response;
+    } catch (error) {
+      console.error('❌ Error saving survey:', error);
+      throw error;
+    }
   },
   
   deleteQuestion: (questionId) => {

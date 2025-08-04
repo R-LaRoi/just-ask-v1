@@ -2,8 +2,8 @@ import React from 'react';
 import { Question } from '../types/survey';
 import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion';
 import TextInputQuestion from './questions/TextInputQuestion';
-import RatingQuestion from './questions/RatingQuestion';
 
+import RatingQuestion from './RatingQuestion';
 interface QuestionRendererProps {
   question: Question;
   answer?: any;

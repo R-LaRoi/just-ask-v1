@@ -22,16 +22,26 @@ interface SurveyReviewProps {
   onSave: () => Promise<void>;
 }
 
+import { useSurveyEditorStore } from '../../stores/surveyEditorStore';
+
 export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [showDemo, setShowDemo] = useState(false);
-  const [shareUrl] = useState(`https://justask.app/survey/${template.id}`);
-  const [qrCodeUrl] = useState(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`);
+  const [shareUrl, setShareUrl] = useState(`https://justask.app/survey/${template.id}`);
+  const { saveSurvey } = useSurveyEditorStore();
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      await onSave();
+      
+      // Use the store's saveSurvey method which calls the API
+      const response = await saveSurvey();
+      
+      // Update share URL from response
+      if (response && response.shareUrl) {
+        setShareUrl(response.shareUrl);
+      }
+      
       Alert.alert(
         'Survey Saved! 🎉',
         'Your survey has been saved successfully and is ready to share.',
