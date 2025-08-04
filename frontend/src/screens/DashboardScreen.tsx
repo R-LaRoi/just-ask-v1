@@ -111,7 +111,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFBFC',
+    backgroundColor: '#f7f7f7', // Light gray background
   },
   scrollView: {
     flex: 1,
@@ -132,24 +132,24 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#222121', // Dark Gray/Black text
     fontWeight: '400',
   },
   userName: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: '#222121', // Dark Gray/Black text
     marginTop: 4,
   },
   signOutButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#ffffff', // White button
   },
   signOutText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#222121', // Dark text
     fontWeight: '500',
   },
   mainContent: {
@@ -157,71 +157,65 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   templateSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ff004d', // Bright Pink card
     borderRadius: 16,
     padding: 24,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
   },
   templateTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#ffffff', // White text on pink background
     marginBottom: 8,
   },
   templateSubtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#ffffff', // White text on pink background
     lineHeight: 24,
   },
   insightsSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#222121', // Dark Gray/Black card
     borderRadius: 16,
     padding: 24,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
   },
   insightsTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#ffffff', // White text on dark background
     marginBottom: 8,
   },
   insightsSubtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#ffffff', // White text on dark background
     lineHeight: 24,
   },
   customSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f7fd04', // Bright Yellow card
     borderRadius: 16,
     padding: 24,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 100,
@@ -229,6 +223,6 @@ const styles = StyleSheet.create({
   customTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#222121', // Dark text on yellow background
   },
 });

@@ -305,10 +305,7 @@ export default function SurveyEditorScreen() {
             {[
               { type: 'multiple_choice', icon: '☑️', title: 'Multiple Choice', desc: 'Single or multiple selection' },
               { type: 'text_input', icon: '📝', title: 'Text Input', desc: 'Short or long text response' },
-              { type: 'rating', icon: '⭐', title: 'Rating', desc: 'Star rating or number scale' },
-              { type: 'slider', icon: '🎚️', title: 'Slider', desc: 'Range selection' },
-              { type: 'date', icon: '📅', title: 'Date', desc: 'Date picker' },
-              { type: 'file_upload', icon: '📎', title: 'File Upload', desc: 'Image or document upload' }
+              { type: 'rating', icon: '⭐', title: 'Rating', desc: 'Star rating or number scale' }
             ].map((questionType) => (
               <TouchableOpacity
                 key={questionType.type}

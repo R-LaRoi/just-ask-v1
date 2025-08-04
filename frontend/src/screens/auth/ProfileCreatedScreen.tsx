@@ -40,7 +40,7 @@ export default function ProfileCreatedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f4f8',
+    backgroundColor: '#222121', // Dark background to match the image
   },
   content: {
     flex: 1,
@@ -55,34 +55,42 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ffffff', // White text on dark background
     marginBottom: 16,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 18,
-    color: '#666',
+    color: '#ffffff', // White text
     marginBottom: 20,
     textAlign: 'center',
     lineHeight: 24,
   },
   description: {
     fontSize: 16,
-    color: '#888',
+    color: '#ffffff', // White text
     marginBottom: 40,
     textAlign: 'center',
     lineHeight: 22,
   },
   button: {
-    backgroundColor: '#FF6B6B',
-    borderRadius: 8,
-    paddingVertical: 16,
+    backgroundColor: '#f7fd04', // Bright yellow button to match onboarding
+    borderRadius: 25, // Rounded button
+    paddingVertical: 18,
     paddingHorizontal: 40,
     alignItems: 'center',
     minWidth: 200,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   buttonText: {
-    color: '#fff',
+    color: '#222121', // Dark text on yellow button
     fontSize: 18,
     fontWeight: 'bold',
   },

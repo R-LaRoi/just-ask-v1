@@ -206,7 +206,7 @@ export default function OnboardingScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f4f8',
+    backgroundColor: '#222121', // Dark background to match image
   },
   contentContainer: {
     padding: 20,
@@ -214,48 +214,65 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    color: '#ffffff', // White text on dark background
+    marginBottom: 9.2, // Increased by 15% (was 8, now 9.2)
   },
   subHeader: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 30,
+    color: '#ffffff', // White text
+    marginBottom: 34.5, // Increased by 15% (was 30, now 34.5)
   },
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#444',
-    marginBottom: 6,
-    marginTop: 10,
+    color: '#ffffff', // White labels
+    marginBottom: 6.9, // Increased by 15% (was 6, now 6.9)
+    marginTop: 11.5, // Increased by 15% (was 10, now 11.5)
   },
   input: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    backgroundColor: '#2d2c2c', // Dark background
+    borderWidth: 0, // No border
+    borderRadius: 25, // Keep rounded corners
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     fontSize: 16,
+    color: '#ffffff', // White text
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   disabledInput: {
-    backgroundColor: '#e9e9e9',
-    color: '#999',
+    backgroundColor: '#f7f7f7', // Light gray for disabled
+    borderColor: '#f7f7f7',
+    color: '#222121',
   },
   errorText: {
-    color: 'red',
+    color: '#ff004d', // Bright pink for errors
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 4.6, // Increased by 15% (was 4, now 4.6)
   },
   button: {
-    backgroundColor: '#FF6B6B',
-    borderRadius: 8,
-    paddingVertical: 15,
+    backgroundColor: '#f7fd04', // Bright yellow button
+    borderRadius: 25,
+    paddingVertical: 18,
     alignItems: 'center',
-    marginTop: 40,
+    marginTop: 46, // Increased by 15% (was 40, now 46)
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   buttonText: {
-    color: '#fff',
+    color: '#222121', // Dark text on yellow button
     fontSize: 18,
     fontWeight: 'bold',
   },
