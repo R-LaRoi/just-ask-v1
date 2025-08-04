@@ -12,13 +12,14 @@ import { useSurveyEditorStore } from '../../stores/surveyEditorStore';
 import { useEditorStore } from '../../stores/editorStore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SurveyTemplate } from '../../types/survey';
+import QuestionRenderer from '../QuestionRenderer';
 
 const { width } = Dimensions.get('window');
 
 interface DemoPreviewProps {
   template: SurveyTemplate;
   onComplete: () => void;
-  useEditorStore?: boolean; // New prop to determine which store to use
+  useEditorStore?: boolean;
 }
 
 export default function DemoPreview({ template, onComplete, useEditorStore: useEditorStoreProp = false }: DemoPreviewProps) {
@@ -26,73 +27,83 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
   const [answers, setAnswers] = useState<{ questionId: number; optionId: string }[]>([]);
   const [isCompleted, setIsCompleted] = useState(false);
 
-  // Use the appropriate store based on the prop
   const surveyEditorStore = useSurveyEditorStore();
   const editorStore = useEditorStore();
 
-  // Get questions from the appropriate store instead of static template
-  const questions = useEditorStoreProp 
+  const questions = useEditorStoreProp
     ? editorStore.editingTemplate?.questions || template.questions
     : surveyEditorStore.questions.length > 0 ? surveyEditorStore.questions : template.questions;
-    
+
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
   const currentAnswer = answers.find(a => a.questionId === currentQuestion?.id);
 
   useEffect(() => {
     if (isCompleted) {
-      // Show completion screen for 3 seconds before calling onComplete
       const timer = setTimeout(() => {
         onComplete();
       }, 3000);
-
       return () => clearTimeout(timer);
     }
   }, [isCompleted, onComplete]);
 
-  // Reset demo state when component mounts
   useEffect(() => {
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setIsCompleted(false);
   }, [template]);
 
-  const handleOptionSelect = (optionIndex: number) => {
+  const handleAnswer = (answer: string | number | string[]) => {
     if (currentQuestion) {
-      // Update local state
-      const newAnswer = { questionId: currentQuestion.id, optionId: optionIndex.toString() };
+      const answerString = Array.isArray(answer) ? answer.join(',') : answer.toString();
+      const newAnswer = { questionId: currentQuestion.id, optionId: answerString };
       const updatedAnswers = answers.filter(a => a.questionId !== currentQuestion.id);
       updatedAnswers.push(newAnswer);
       setAnswers(updatedAnswers);
 
-      // Also update the appropriate store if needed
       if (useEditorStoreProp) {
-        editorStore.updateDemoResponse(currentQuestion.id, optionIndex.toString());
+        editorStore.updateDemoResponse(currentQuestion.id, answerString);
       } else {
-        surveyEditorStore.answerDemoQuestion(currentQuestion.id, optionIndex.toString());
+        surveyEditorStore.answerDemoQuestion(currentQuestion.id, answerString);
       }
 
-      // Auto-advance after a short delay
-      setTimeout(() => {
-        const nextIndex = currentQuestionIndex + 1;
-        if (nextIndex >= questions.length) {
-          setIsCompleted(true);
-          if (useEditorStoreProp) {
-            // editorStore doesn't have completeDemo, so we just mark as completed locally
-          } else {
-            surveyEditorStore.completeDemo();
-          }
-        } else {
-          setCurrentQuestionIndex(nextIndex);
-          if (useEditorStoreProp) {
-            editorStore.nextDemoQuestion();
-          } else {
-            surveyEditorStore.nextDemoQuestion();
-          }
-        }
-      }, 500);
+      // Only auto-advance for multiple choice and rating questions
+      if (currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating') {
+        setTimeout(() => {
+          handleNext();
+        }, 500);
+      }
     }
   };
+
+  const handleNext = () => {
+    const nextIndex = currentQuestionIndex + 1;
+    if (nextIndex >= questions.length) {
+      setIsCompleted(true);
+      if (useEditorStoreProp) {
+        // editorStore doesn't have completeDemo
+      } else {
+        surveyEditorStore.completeDemo();
+      }
+    } else {
+      setCurrentQuestionIndex(nextIndex);
+      if (useEditorStoreProp) {
+        editorStore.nextDemoQuestion();
+      } else {
+        surveyEditorStore.nextDemoQuestion();
+      }
+    }
+  };
+
+  const handleBack = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+    }
+  };
+
+  const canContinue = currentAnswer !== undefined || !currentQuestion?.required;
+  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  const shouldShowContinueButton = currentQuestion?.type === 'text_input';
 
   if (isCompleted) {
     return (
@@ -101,7 +112,6 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
           colors={['#667eea', '#764ba2']}
           style={styles.completionGradient}
         >
-          {/* Demo Indicator with bright red avatar */}
           <View style={styles.demoIndicator}>
             <View style={styles.demoAvatar}>
               <Text style={styles.demoAvatarText}>👤</Text>
@@ -118,7 +128,6 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
             {answers.length} of {questions.length} questions answered
           </Text>
 
-          {/* Optional: Add a manual return button */}
           <TouchableOpacity
             style={styles.returnButton}
             onPress={onComplete}
@@ -140,6 +149,26 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
 
   return (
     <View style={styles.container}>
+      {/* Header with Back Button */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={handleBack}
+          style={[styles.backButton, currentQuestionIndex === 0 && styles.disabledBackButton]}
+          disabled={currentQuestionIndex === 0}
+        >
+          <Text style={[styles.backButtonText, currentQuestionIndex === 0 && styles.disabledBackButtonText]}>←</Text>
+        </TouchableOpacity>
+
+        <View style={styles.questionInfo}>
+          <Text style={styles.questionCounter}>
+            {currentQuestionIndex + 1} of {questions.length}
+          </Text>
+          <View style={styles.demoIndicatorSmall}>
+            <Text style={styles.demoLabelSmall}>DEMO</Text>
+          </View>
+        </View>
+      </View>
+
       {/* Progress Bar */}
       <View style={styles.progressContainer}>
         <View style={styles.progressBackground}>
@@ -150,9 +179,6 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
             ]}
           />
         </View>
-        <Text style={styles.progressText}>
-          {currentQuestionIndex + 1} of {questions.length}
-        </Text>
       </View>
 
       {/* Question Content */}
@@ -171,44 +197,36 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
           )}
         </View>
 
-        {/* Options */}
-        <View style={styles.optionsContainer}>
-          {currentQuestion.options?.map((option, index) => {
-            const isSelected = currentAnswer?.optionId === index.toString();
-
-            return (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.optionButton,
-                  isSelected && styles.selectedOption
-                ]}
-                onPress={() => handleOptionSelect(index)}
-                activeOpacity={0.8}
-              >
-                <View style={[
-                  styles.optionRadio,
-                  isSelected && styles.selectedRadio
-                ]}>
-                  {isSelected && <View style={styles.radioInner} />}
-                </View>
-                <Text style={[
-                  styles.optionText,
-                  isSelected && styles.selectedOptionText
-                ]}>
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        <QuestionRenderer
+          question={currentQuestion}
+          answer={currentAnswer?.optionId}
+          onAnswer={handleAnswer}
+        />
       </ScrollView>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Select an option to continue
-        </Text>
+        {shouldShowContinueButton ? (
+          <TouchableOpacity
+            style={[
+              styles.continueButton,
+              !canContinue && styles.disabledButton
+            ]}
+            onPress={handleNext}
+            disabled={!canContinue}
+          >
+            <Text style={[
+              styles.continueButtonText,
+              !canContinue && styles.disabledButtonText
+            ]}>
+              {isLastQuestion ? '✓ Complete Demo' : 'Continue →'}
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <Text style={styles.footerText}>
+            {currentQuestion.type === 'rating' ? 'Select a rating to continue' : 'Select an option to continue'}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -229,6 +247,58 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontWeight: '500',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#F9FAFB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  disabledBackButton: {
+    backgroundColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
+  },
+  backButtonText: {
+    fontSize: 20,
+    color: '#374151',
+    fontWeight: '600',
+  },
+  disabledBackButtonText: {
+    color: '#9CA3AF',
+  },
+  questionInfo: {
+    alignItems: 'flex-end',
+  },
+  questionCounter: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  demoIndicatorSmall: {
+    marginTop: 4,
+    backgroundColor: '#EF4444',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  demoLabelSmall: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
   progressContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -246,12 +316,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#667eea',
     borderRadius: 3,
-  },
-  progressText: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontWeight: '500',
-    textAlign: 'center',
   },
   content: {
     flex: 1,
@@ -275,53 +339,6 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     lineHeight: 24,
   },
-  optionsContainer: {
-    gap: 12,
-  },
-  optionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: '#F9FAFB',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 12,
-    minHeight: 60,
-  },
-  selectedOption: {
-    backgroundColor: '#EEF2FF',
-    borderColor: '#667eea',
-  },
-  optionRadio: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    marginRight: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  selectedRadio: {
-    borderColor: '#667eea',
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#667eea',
-  },
-  optionText: {
-    fontSize: 16,
-    color: '#374151',
-    fontWeight: '500',
-    flex: 1,
-  },
-  selectedOptionText: {
-    color: '#667eea',
-    fontWeight: '600',
-  },
   footer: {
     padding: 20,
     paddingBottom: 40,
@@ -335,6 +352,33 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontStyle: 'italic',
   },
+  continueButton: {
+    backgroundColor: '#667eea',
+    paddingVertical: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#667eea',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  disabledButton: {
+    backgroundColor: '#E5E7EB',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  continueButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  disabledButtonText: {
+    color: '#9CA3AF',
+  },
   completionContainer: {
     flex: 1,
   },
@@ -343,6 +387,44 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 40,
+  },
+  demoIndicator: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  demoAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  demoAvatarText: {
+    fontSize: 24,
+    color: '#FFFFFF',
+  },
+  demoLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    backgroundColor: 'rgba(239, 68, 68, 0.9)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    textAlign: 'center',
   },
   completionIcon: {
     fontSize: 64,
@@ -366,44 +448,6 @@ const styles = StyleSheet.create({
     color: '#C7D2FE',
     textAlign: 'center',
     fontWeight: '500',
-  },
-  demoIndicator: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  demoAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#EF4444', // Bright red background
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  demoAvatarText: {
-    fontSize: 24,
-    color: '#FFFFFF',
-  },
-  demoLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    backgroundColor: 'rgba(239, 68, 68, 0.9)', // Semi-transparent red
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    textAlign: 'center',
   },
   returnButton: {
     marginTop: 32,
