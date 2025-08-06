@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useAuthStore } from '../stores/authStore';
 import { RootStackParamList } from '../types/navigation';
+import LoadingScreen from './LoadingScreen';
 import WelcomeScreen from './auth/WelcomeScreen';
 import OnboardingScreen from './auth/OnboardingScreen';
 import ProfileCreatedScreen from '../screens/auth/ProfileCreatedScreen';
@@ -21,30 +21,35 @@ export default function AppNavigator() {
     user
   } = useAuthStore();
 
+  const [showCustomLoading, setShowCustomLoading] = useState(true);
+
   // Check for stored auth token on app start
   useEffect(() => {
     rehydrateAuth();
   }, []);
 
-  // Show loading screen while checking stored auth
+  // Show custom loading screen first, then go directly to auth
+  if (showCustomLoading) {
+    return (
+      <LoadingScreen
+        onLoadingComplete={() => setShowCustomLoading(false)}
+        duration={3000}
+      />
+    );
+  }
+
+  // Simplified flow - after loading, go directly to auth if not authenticated
   if (isRehydrating) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#4285F4" />
-      </View>
+      <LoadingScreen
+        onLoadingComplete={() => { }}
+        duration={500}
+      />
     );
   }
 
   // Check if profile was just created (intermediate state)
   const isProfileCreated = user?.profileCreated || false;
-
-  // Add debugging logs
-  console.log('Navigation Debug:', {
-    isAuthenticated,
-    isOnboardingComplete,
-    isProfileCreated,
-    user: user
-  });
 
   return (
     <Stack.Navigator
@@ -65,8 +70,6 @@ export default function AppNavigator() {
         // Main app screens
         <>
           <Stack.Screen name="Dashboard" component={DashboardScreen} />
-          {/* Remove this line: */}
-          {/* <Stack.Screen name="TemplateSelection" component={TemplateSelectionScreen} /> */}
           <Stack.Screen name="SurveyEditor" component={SurveyEditorScreen} />
           <Stack.Screen name="SurveyTaking" component={SurveyTakingScreen} />
         </>
@@ -74,12 +77,3 @@ export default function AppNavigator() {
     </Stack.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-});

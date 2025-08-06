@@ -7,10 +7,15 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Platform,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { useAuthRequest, makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import { useAuthStore } from '../../stores/authStore';
+import Video from 'react-native-video';
+
+const { width, height } = Dimensions.get('window');
 
 // Required for expo-auth-session to work properly
 WebBrowser.maybeCompleteAuthSession();
@@ -77,94 +82,124 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        {/* Main heading */}
-        <View style={styles.headerSection}>
-          <Text style={styles.mainTitle}>Just Ask</Text>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.description}>audience</Text>
-            <Text style={styles.description}>fans</Text>
-            <Text style={styles.description}>subscribers</Text>
-            <Text style={styles.description}>friends</Text>
-            <Text style={styles.description}>classmates ...</Text>
-          </View>
-        </View>
+    <View style={styles.container}>
+      {/* Video Background */}
+      <Video
+        source={{ uri: 'https://res.cloudinary.com/do5wpgk5o/video/upload/v1754402005/ask-vid-white_yxwqid.mp4' }}
+        style={styles.backgroundVideo}
+        muted
+        repeat
+        paused={false}
+        resizeMode="cover"
+        onLoad={() => console.log('Video loaded from URL')}
+        onError={(error) => console.log('Video error:', error)}
+      />
 
-        {/* Login section */}
-        <View style={styles.loginSection}>
-          <TouchableOpacity
-            style={[styles.gmailButton, isLoading && styles.gmailButtonDisabled]}
-            onPress={handleGmailLogin}
-            disabled={isLoading || !request}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-              <Text style={styles.gmailButtonText}>login gmail</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+      {/* Content box matching the uploaded design */}
+      <View style={styles.contentBox}>
+        <Image
+          source={require('../../../assets/ask-script.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.subtitle}>Creators -</Text>
+
+        <TouchableOpacity
+          style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+          onPress={handleGmailLogin}
+          disabled={isLoading || !request}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#ffffff" size="small" />
+          ) : (
+            <>
+              <Image
+                source={require('../../../assets/g_icon.png')}
+                style={styles.googleIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.loginButtonText}>Continue with Google</Text>
+            </>
+          )}
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 30,
-    paddingVertical: 40,
-    justifyContent: 'space-between',
-  },
-  headerSection: {
-    flex: 1,
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
-  mainTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 30,
+  backgroundVideo: {
+    position: 'absolute',
+    width: width,
+    height: height,
+    top: 0,
+    left: 0,
   },
-  descriptionContainer: {
-    alignItems: 'flex-start',
+  contentBox: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: '#000000',
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 8,
+    minWidth: 280,
   },
-  description: {
-    fontSize: 18,
-    color: '#666666',
-    marginBottom: 8,
-    lineHeight: 24,
+  logo: {
+    width: 200,
+    height: 100,
+    marginBottom: 20,
   },
-  loginSection: {
-    paddingBottom: 50,
+  subtitle: {
+    fontSize: 32,
+    color: '#000000',
+    marginBottom: 40,
+    textAlign: 'center',
   },
-  gmailButton: {
-    backgroundColor: '#4285F4',
+  loginButton: {
+    backgroundColor: '#2c2c2c',
     paddingVertical: 16,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    minWidth: 280,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 4,
   },
-  gmailButtonText: {
-    color: '#FFFFFF',
+  googleIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  loginButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    color: '#ffffff',
+    textAlign: 'center',
+    fontWeight: '500',
   },
-  gmailButtonDisabled: {
+  loginButtonDisabled: {
     opacity: 0.6,
   },
 });
