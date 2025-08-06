@@ -66,7 +66,7 @@ export default function SurveyEditor() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
   },
   scrollContent: {
     padding: 20,
@@ -78,16 +78,16 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151
     marginBottom: 12,
   },
   titleInput: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
-    backgroundColor: '#F9FAFB',
+    color: '#ffffff',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     borderRadius: 12,
     padding: 16,
     minHeight: 60,
@@ -102,19 +102,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 20,
     borderRadius: 12,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     borderStyle: 'dashed',
   },
   addQuestionIcon: {
     fontSize: 24,
-    color: '#6B7280',
+    color: '#ffffff', // Changed from #6B7280
     marginRight: 8,
   },
   addQuestionText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#ffffff', // Changed from #6B7280
     fontWeight: '600',
   },
 });

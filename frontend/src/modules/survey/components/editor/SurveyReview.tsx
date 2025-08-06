@@ -33,15 +33,15 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      
+
       // Use the store's saveSurvey method which calls the API
       const response = await saveSurvey();
-      
+
       // Update share URL from response
       if (response && response.shareUrl) {
         setShareUrl(response.shareUrl);
       }
-      
+
       Alert.alert(
         'Survey Saved! 🎉',
         'Your survey has been saved successfully and is ready to share.',
@@ -292,7 +292,7 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
   },
   scrollView: {
     flex: 1,
@@ -303,33 +303,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#ffffff',
   },
   backToDemoButton: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
     borderRadius: 8,
     marginRight: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   backToDemoButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
   },
   demoTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
   },
   // Existing styles
   overviewSection: {
     padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#ffffff', // Changed from #F3F4F6 to white
   },
   surveyHeader: {
     flexDirection: 'row',
@@ -346,31 +348,33 @@ const styles = StyleSheet.create({
   surveyTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     marginBottom: 4,
   },
   surveyDescription: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     lineHeight: 24,
   },
   editButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   editButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: '#ffffff', // Changed from #F3F4F6 to white
   },
   statItem: {
     alignItems: 'center',
@@ -378,30 +382,31 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#667eea',
+    color: '#ffffff', // Changed from '#f7fd04' to white
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#ffffff', // Changed from '#cccccc' to white
     fontWeight: '500',
   },
   questionsSection: {
     padding: 24,
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     marginBottom: 16,
   },
   questionPreview: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   questionHeader: {
     flexDirection: 'row',
@@ -411,7 +416,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#667eea',
+    backgroundColor: '#ffffff', // Changed from '#f7fd04' to white
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -419,7 +424,7 @@ const styles = StyleSheet.create({
   questionNumberText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#000000', // Keeping black for contrast with white background
   },
   questionInfo: {
     flex: 1,
@@ -436,22 +441,24 @@ const styles = StyleSheet.create({
   questionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     flex: 1,
   },
   requiredBadge: {
     fontSize: 10,
     fontWeight: '600',
     color: '#EF4444',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#2a1a1a', // Changed from #FEF2F2 to dark background
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
     marginLeft: 8,
+    borderWidth: 1,
+    borderColor: '#EF4444', // Added red border
   },
   questionDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     lineHeight: 20,
   },
   optionsPreview: {
@@ -465,22 +472,22 @@ const styles = StyleSheet.create({
   },
   optionBullet: {
     fontSize: 16,
-    color: '#9CA3AF',
+    color: '#ffffff', // Changed from #9CA3AF to white
     marginRight: 8,
   },
   optionText: {
     fontSize: 14,
-    color: '#374151',
+    color: '#cccccc', // Changed from #374151 to light gray
   },
   moreOptions: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     fontStyle: 'italic',
     marginTop: 4,
   },
   sharingSection: {
     padding: 24,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
   },
   linkContainer: {
     marginBottom: 24,
@@ -488,35 +495,35 @@ const styles = StyleSheet.create({
   linkLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
     marginBottom: 8,
   },
   linkRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     paddingHorizontal: 12,
     paddingVertical: 12,
   },
   linkText: {
     flex: 1,
     fontSize: 14,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     marginRight: 12,
   },
   copyButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#667eea',
+    backgroundColor: '#f7fd04', // Changed to your progress color
     borderRadius: 6,
   },
   copyButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#000000', // Changed to black for contrast
   },
   qrSection: {
     marginBottom: 24,
@@ -524,16 +531,16 @@ const styles = StyleSheet.create({
   qrLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
     marginBottom: 8,
   },
   qrContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     padding: 16,
   },
   qrPlaceholder: {
@@ -548,23 +555,25 @@ const styles = StyleSheet.create({
   qrText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
     marginBottom: 4,
   },
   qrSubtext: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
   },
   downloadQrButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   downloadQrText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
   },
   shareActions: {
     flexDirection: 'row',
@@ -576,6 +585,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
     borderRadius: 8,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   shareButtonText: {
     fontSize: 16,
@@ -588,6 +599,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#6B7280',
     borderRadius: 8,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   embedButtonText: {
     fontSize: 16,
@@ -598,25 +611,25 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     paddingHorizontal: 24,
     paddingVertical: 16,
-    paddingBottom: 34, // Safe area padding
-    backgroundColor: '#FFFFFF',
+    paddingBottom: 34,
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#ffffff',
     gap: 12,
   },
   editBottomButton: {
     width: '100%',
     paddingVertical: 16,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   editBottomButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
   },
   demoBottomButton: {
     width: '100%',
@@ -624,6 +637,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
     borderRadius: 12,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
   },
   demoBottomButtonText: {
     fontSize: 16,
@@ -634,6 +649,8 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 12,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
   },
   saveButtonDisabled: {
     opacity: 0.7,

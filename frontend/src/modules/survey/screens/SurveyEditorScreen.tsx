@@ -12,6 +12,7 @@ import {
   Modal,
   Dimensions,
   StatusBar,
+  Image, // Add this
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useEditorStore } from '../stores/editorStore';
@@ -102,17 +103,20 @@ export default function SurveyEditorScreen() {
       </TouchableOpacity>
 
       <View style={styles.headerCenter}>
-        <Text style={styles.headerTitle}>
-          {currentStep === 'template' && 'Choose Template'}
-          {currentStep === 'edit' && 'Edit Survey'}
-          {currentStep === 'demo' && 'Demo Preview'}
-          {currentStep === 'review' && 'Review & Share'}
-        </Text>
-        {editingTemplate && (
-          <Text style={styles.headerSubtitle}>
-            {editingTemplate.questionCount} questions
+        {currentStep === 'template' ? (
+          <Image
+            source={require('../../../../assets/ask-script.png')}
+            style={{ width: 160, height: 60, tintColor: '#ffffff' }} // Made larger and ensured white color
+            resizeMode="contain"
+          />
+        ) : (
+          <Text style={styles.headerTitle}>
+            {currentStep === 'edit' && 'Edit Survey'}
+            {currentStep === 'demo' && 'Demo Preview'}
+            {currentStep === 'review' && 'Review & Share'}
           </Text>
         )}
+        {/* Removed the editingTemplate condition and "3 questions" text */}
       </View>
 
       <View style={styles.headerActions}>
@@ -351,7 +355,7 @@ export default function SurveyEditorScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
   },
   loadingContainer: {
     flex: 1,
@@ -368,23 +372,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#333333',
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F9FAFB',
+    width: 32, // Reduced from 44 to match step indicator
+    height: 32, // Reduced from 44 to match step indicator
+    borderRadius: 16, // Adjusted from 22 to maintain circular shape
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
   },
   backButtonText: {
-    fontSize: 20,
-    color: '#374151',
+    fontSize: 16, // Reduced from 20 to fit smaller button
+    color: '#ffffff',
     fontWeight: '600',
   },
   headerCenter: {
@@ -394,11 +398,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     marginTop: 2,
   },
   headerActions: {
@@ -432,7 +436,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 20,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed to black
   },
   stepContainer: {
     flexDirection: 'row',
@@ -442,32 +446,39 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    borderWidth: 0.5,
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepDotActive: {
-    backgroundColor: '#667eea',
+    backgroundColor: '#f7fd04', // Your specified progress color
+    borderColor: '#000000', // Black border for active
   },
   stepDotCompleted: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#f7fd04', // Your specified progress color
+    borderColor: '#000000', // Black border for completed
   },
   stepNumber: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#ffffff', // White text
   },
   stepNumberActive: {
-    color: '#FFFFFF',
+    color: '#000000', // Black text for active/completed steps
   },
   stepLine: {
     width: 40,
     height: 2,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    borderWidth: 0.5,
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
     marginHorizontal: 8,
   },
   stepLineCompleted: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#f7fd04', // Your specified progress color
+    borderColor: '#000000', // Black border
   },
   content: {
     flex: 1,
@@ -477,9 +488,9 @@ const styles = StyleSheet.create({
   },
   templateHeader: {
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #FFFFFF to black
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#ffffff', // Changed from #E5E7EB to white
   },
   titleContainer: {
     flexDirection: 'row',
@@ -490,17 +501,18 @@ const styles = StyleSheet.create({
   templateTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     flex: 1,
   },
   titleInput: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     flex: 1,
     borderBottomWidth: 2,
-    borderBottomColor: '#667eea',
+    borderBottomColor: '#f7fd04', // Changed from #667eea to your progress color
     paddingBottom: 4,
+    backgroundColor: 'transparent', // Added to ensure no background
   },
   descriptionContainer: {
     flexDirection: 'row',
@@ -509,20 +521,22 @@ const styles = StyleSheet.create({
   },
   templateDescription: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     flex: 1,
   },
   descriptionInput: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     flex: 1,
     borderBottomWidth: 2,
-    borderBottomColor: '#667eea',
+    borderBottomColor: '#f7fd04', // Changed from #667eea to your progress color
     paddingBottom: 4,
+    backgroundColor: 'transparent', // Added to ensure no background
   },
   editIcon: {
     fontSize: 16,
     marginLeft: 8,
+    color: '#ffffff', // Added white color for edit icon
   },
   questionsContainer: {
     flex: 1,

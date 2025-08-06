@@ -66,7 +66,7 @@ export default function DashboardScreen() {
               Survey says, {user?.name || 'creator name'} is awesome!
             </Text>
             <TouchableOpacity style={styles.profileIcon} onPress={handleSignOut}>
-              <Icon name="user" size={20} color="#000000" />
+              <Icon name="user" size={20} color="#ffffff" />
             </TouchableOpacity>
           </View>
 
@@ -112,6 +112,10 @@ export default function DashboardScreen() {
               >
                 <Text style={styles.cardButtonText}>VIEW</Text>
               </TouchableOpacity>
+              <Image
+                source={require('../../assets/blocks.png')}
+                style={styles.createSurveyImage}
+              />
             </View>
           </View>
         </ScrollView>
@@ -184,7 +188,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
+    borderWidth: 2,
+    borderColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -255,7 +261,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginHorizontal: 24,
-    marginTop: 10,
+    marginTop: 30,
     marginBottom: 24,
     backgroundColor: '#000000',
     alignSelf: 'flex-start',
@@ -280,8 +286,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     position: 'absolute',
-    bottom: 15,
-    right: 15,
+    bottom: 20,
+    right: 20,
   },
   navItem: {
     flex: 1,

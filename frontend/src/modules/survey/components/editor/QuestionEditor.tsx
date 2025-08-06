@@ -153,7 +153,7 @@ export default function QuestionEditor({ question, questionIndex, isLast, useEdi
           onPress={handleDeleteQuestion}
           activeOpacity={0.7}
         >
-          <Text style={styles.deleteButtonText}>🗑️</Text>
+          <Text style={styles.deleteButtonText}>⊖</Text>
         </TouchableOpacity>
       </View>
 
@@ -265,12 +265,12 @@ export default function QuestionEditor({ question, questionIndex, isLast, useEdi
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#667eea',
+    backgroundColor: '#f7fd04', // Changed to your progress color
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   questionNumberText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#000000', // Changed to black for contrast with yellow
   },
   questionInfo: {
     flex: 1,
@@ -307,43 +307,48 @@ const styles = StyleSheet.create({
   },
   questionType: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#cccccc', // Changed from #6B7280 to light gray
     fontWeight: '500',
   },
   requiredBadge: {
     fontSize: 12,
     color: '#EF4444',
     fontWeight: '600',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#2a1a1a', // Changed from #FEF2F2 to dark background
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EF4444', // Added red border
   },
   deleteButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   deleteButtonText: {
     fontSize: 16,
+    color: '#ffffff', // Added white color
   },
   titleContainer: {
     marginBottom: 20,
   },
   titleEditContainer: {
     borderWidth: 2,
-    borderColor: '#667eea',
+    borderColor: '#f7fd04', // Changed from #667eea to your progress color
     borderRadius: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #2a2a2a
   },
   titleInput: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     padding: 16,
     minHeight: 60,
     textAlignVertical: 'top',
@@ -356,9 +361,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   titleDisplay: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #2a2a2a
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     borderRadius: 12,
     padding: 16,
     minHeight: 60,
@@ -366,12 +371,12 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     lineHeight: 24,
   },
   editHint: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: '#cccccc', // Changed from #9CA3AF to light gray
     marginTop: 4,
     fontStyle: 'italic',
   },
@@ -381,19 +386,19 @@ const styles = StyleSheet.create({
   optionsLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#ffffff', // Changed from #374151 to white
     marginBottom: 12,
   },
   addOptionContainer: {
     borderWidth: 2,
-    borderColor: '#667eea',
+    borderColor: '#f7fd04', // Changed from #667eea to your progress color
     borderRadius: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #2a2a2a
     marginTop: 8,
   },
   addOptionInput: {
     fontSize: 16,
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     padding: 16,
     minHeight: 50,
   },
@@ -411,41 +416,45 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     marginTop: 8,
   },
   addOptionIcon: {
     fontSize: 18,
-    color: '#6B7280',
+    color: '#ffffff', // Changed from #6B7280 to white
     marginRight: 6,
   },
   addOptionText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#ffffff', // Changed from #6B7280 to white
     fontWeight: '500',
   },
   cancelButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 6,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   cancelButtonText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#ffffff', // Changed from #6B7280 to white
     fontWeight: '500',
   },
   saveButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 6,
-    backgroundColor: '#667eea',
+    backgroundColor: '#f7fd04', // Changed from #667eea to your progress color
+    borderWidth: 1,
+    borderColor: '#000000', // Added black border for contrast
   },
   saveButtonText: {
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#000000', // Changed from #FFFFFF to black for contrast
     fontWeight: '600',
   },
 });

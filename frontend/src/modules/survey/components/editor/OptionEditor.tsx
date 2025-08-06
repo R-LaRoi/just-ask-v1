@@ -28,7 +28,7 @@ export default function OptionEditor({
 }: OptionEditorProps) {
   // Use surveyEditorStore functions
   const { updateOption: updateOptionSurvey } = useSurveyEditorStore();
-  
+
   // Use editorStore functions
   const { updateOption: updateOptionEditor } = useEditorStore();
 
@@ -43,7 +43,7 @@ export default function OptionEditor({
       tempText,
       originalOption: option
     });
-    
+
     if (useEditorStoreProp) {
       console.log('📝 Using editorStore updateOption');
       updateOptionEditor(questionId, optionIndex, tempText);
@@ -68,7 +68,7 @@ export default function OptionEditor({
       option,
       useEditorStoreProp
     });
-    
+
     if (onRemove) {
       console.log('✅ Calling onRemove function');
       onRemove();
@@ -147,13 +147,13 @@ export default function OptionEditor({
           onPress={handleRemoveClick}
           activeOpacity={0.7}
         >
-          <Text style={styles.removeButtonText}>🗑️</Text>
+          <Text style={styles.removeButtonText}>⊖</Text>
         </TouchableOpacity>
       )}
       
       {!canRemove && (
         <View style={styles.removeButton}>
-          <Text style={[styles.removeButtonText, { opacity: 0.3 }]}>🗑️</Text>
+          <Text style={[styles.removeButtonText, { opacity: 0.3 }]}>⊖</Text>
         </View>
       )}
     </View>
@@ -164,9 +164,9 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)',
     borderRadius: 8,
     marginBottom: 8,
     minHeight: 50,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   dragDots: {
     width: 3,
     height: 3,
-    backgroundColor: '#9CA3AF',
+    backgroundColor: '#cccccc', // Changed from #9CA3AF to light gray
     borderRadius: 1.5,
     marginVertical: 1,
   },
@@ -195,12 +195,14 @@ const styles = StyleSheet.create({
   editInput: {
     flex: 1,
     fontSize: 16,
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#2a2a2a', // Changed from #F9FAFB to dark gray
     borderRadius: 6,
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
   },
   editActions: {
     flexDirection: 'row',
@@ -217,12 +219,12 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
     marginRight: 12,
   },
   optionText: {
     fontSize: 16,
-    color: '#111827',
+    color: '#ffffff', // Changed from #111827 to white
     flex: 1,
   },
   removeButton: {
@@ -234,31 +236,36 @@ const styles = StyleSheet.create({
   },
   removeButtonText: {
     fontSize: 16,
+    color: '#ffffff', // Added white color
   },
   cancelButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(55, 55, 55, 0.72)',
   },
   cancelButtonText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#ffffff', // Changed from #6B7280 to white
     fontWeight: '600',
   },
   saveButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#10B981',
+    backgroundColor: '#f7fd04', // Changed from #10B981 to your progress color
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#000000', // Added black border for contrast
   },
   saveButtonText: {
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#000000', // Changed from #FFFFFF to black for contrast
     fontWeight: '600',
   },
 });
