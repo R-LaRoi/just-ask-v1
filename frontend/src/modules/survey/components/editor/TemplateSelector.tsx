@@ -42,23 +42,14 @@ export default function TemplateSelector({ onSelectTemplate, onCreateNew }: Temp
         onPress={() => handleTemplateSelect(template)}
         activeOpacity={0.8}
       >
-        <LinearGradient
-          colors={isSelected ? ['#667eea', '#764ba2'] : ['#f8fafc', '#e2e8f0']}
-          style={styles.templateGradient}
-        >
+        <View style={[styles.templateContent, isSelected && styles.templateContentSelected]}>
           <View style={styles.templateHeader}>
             <Text style={styles.templateIcon}>{template.icon}</Text>
             <View style={styles.templateInfo}>
-              <Text style={[
-                styles.templateTitle,
-                isSelected && styles.templateTitleSelected
-              ]}>
+              <Text style={styles.templateTitle}>
                 {template.title}
               </Text>
-              <Text style={[
-                styles.templateDescription,
-                isSelected && styles.templateDescriptionSelected
-              ]}>
+              <Text style={styles.templateDescription}>
                 {template.description}
               </Text>
             </View>
@@ -66,46 +57,28 @@ export default function TemplateSelector({ onSelectTemplate, onCreateNew }: Temp
 
           <View style={styles.templateStats}>
             <View style={styles.statItem}>
-              <Text style={[
-                styles.statValue,
-                isSelected && styles.statValueSelected
-              ]}>
+              <Text style={styles.statValue}>
                 {template.questionCount}
               </Text>
-              <Text style={[
-                styles.statLabel,
-                isSelected && styles.statLabelSelected
-              ]}>
+              <Text style={styles.statLabel}>
                 Questions
               </Text>
             </View>
 
             <View style={styles.statItem}>
-              <Text style={[
-                styles.statValue,
-                isSelected && styles.statValueSelected
-              ]}>
+              <Text style={styles.statValue}>
                 {template.estimatedTime}
               </Text>
-              <Text style={[
-                styles.statLabel,
-                isSelected && styles.statLabelSelected
-              ]}>
+              <Text style={styles.statLabel}>
                 Duration
               </Text>
             </View>
 
             <View style={styles.statItem}>
-              <Text style={[
-                styles.statValue,
-                isSelected && styles.statValueSelected
-              ]}>
+              <Text style={styles.statValue}>
                 {template.completionRate.split('%')[0]}%
               </Text>
-              <Text style={[
-                styles.statLabel,
-                isSelected && styles.statLabelSelected
-              ]}>
+              <Text style={styles.statLabel}>
                 Completion
               </Text>
             </View>
@@ -116,7 +89,7 @@ export default function TemplateSelector({ onSelectTemplate, onCreateNew }: Temp
               <Text style={styles.selectedIcon}>✓</Text>
             </View>
           )}
-        </LinearGradient>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -141,11 +114,8 @@ export default function TemplateSelector({ onSelectTemplate, onCreateNew }: Temp
           onPress={onCreateNew}
           activeOpacity={0.8}
         >
-          <LinearGradient
-            colors={['#667eea', '#764ba2']}
-            style={styles.createNewGradient}
-          >
-            <View style={styles.createNewContent}>
+          <View style={styles.createNewContent}>
+            <View style={styles.createNewTextContainer}>
               <Text style={styles.createNewIcon}>✨</Text>
               <Text style={styles.createNewTitle}>Start from Scratch</Text>
               <Text style={styles.createNewSubtitle}>
@@ -155,7 +125,7 @@ export default function TemplateSelector({ onSelectTemplate, onCreateNew }: Temp
             <View style={styles.createNewArrow}>
               <Text style={styles.arrowIcon}>→</Text>
             </View>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
 
         {/* Template Options */}
@@ -171,22 +141,22 @@ export default function TemplateSelector({ onSelectTemplate, onCreateNew }: Temp
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#000000',
   },
   header: {
     paddingHorizontal: 24,
     paddingVertical: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#000000',
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#111827',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#B0B0B0',
     lineHeight: 24,
   },
   scrollView: {
@@ -198,24 +168,24 @@ const styles = StyleSheet.create({
   },
   createNewCard: {
     marginBottom: 32,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#667eea',
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 8,
   },
-  createNewGradient: {
+  createNewContent: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingVertical: 20,
   },
-  createNewContent: {
+  createNewTextContainer: {
     flex: 1,
   },
   createNewIcon: {
@@ -225,25 +195,25 @@ const styles = StyleSheet.create({
   createNewTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#000000',
     marginBottom: 4,
   },
   createNewSubtitle: {
     fontSize: 14,
-    color: '#E0E7FF',
+    color: '#666666',
     lineHeight: 20,
   },
   createNewArrow: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#FFD700',
     alignItems: 'center',
     justifyContent: 'center',
   },
   arrowIcon: {
     fontSize: 18,
-    color: '#FFFFFF',
+    color: '#000000',
     fontWeight: '600',
   },
   templatesSection: {
@@ -252,13 +222,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
+    color: '#FFFFFF',
     marginBottom: 16,
   },
   templateCard: {
     marginBottom: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -269,14 +239,19 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   templateCardSelected: {
-    shadowColor: '#667eea',
+    shadowColor: '#FFD700',
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    borderWidth: 2,
+    borderColor: '#FFD700',
   },
-  templateGradient: {
+  templateContent: {
     padding: 20,
     position: 'relative',
+  },
+  templateContentSelected: {
+    backgroundColor: '#000000',
   },
   templateHeader: {
     flexDirection: 'row',
@@ -293,19 +268,13 @@ const styles = StyleSheet.create({
   templateTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: '#000000',
     marginBottom: 4,
-  },
-  templateTitleSelected: {
-    color: '#FFFFFF',
   },
   templateDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#666666',
     lineHeight: 20,
-  },
-  templateDescriptionSelected: {
-    color: '#E0E7FF',
   },
   templateStats: {
     flexDirection: 'row',
@@ -318,19 +287,13 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827',
+    color: '#000000',
     marginBottom: 2,
-  },
-  statValueSelected: {
-    color: '#FFFFFF',
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#666666',
     fontWeight: '500',
-  },
-  statLabelSelected: {
-    color: '#C7D2FE',
   },
   selectedIndicator: {
     position: 'absolute',
@@ -339,13 +302,13 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#FFD700',
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectedIcon: {
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#000000',
     fontWeight: '700',
   },
 });

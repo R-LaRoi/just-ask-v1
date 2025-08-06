@@ -7,11 +7,16 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  Dimensions,
+  Image
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuthStore } from '../stores/authStore';
 import { RootStackParamList } from '../types/navigation';
+import Icon from 'react-native-vector-icons/Feather';
+
+const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
 type DashboardScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Dashboard'>;
 
@@ -30,7 +35,7 @@ export default function DashboardScreen() {
     );
   };
 
-  const handleStartWithTemplate = () => {
+  const handleCreateSurvey = () => {
     navigation.navigate('SurveyEditor');
   };
 
@@ -42,68 +47,106 @@ export default function DashboardScreen() {
     );
   };
 
-  const handleCustomQuiz = () => {
-    Alert.alert(
-      'Coming Soon!',
-      'Custom quiz builder will be available in a future update.',
-      [{ text: 'OK' }]
-    );
+  const handleNavigation = (screen: string) => {
+    // Handle navigation for bottom nav items
+    console.log(`Navigate to ${screen}`);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.welcomeSection}>
-            <Text style={styles.greeting}>Hello,</Text>
-            <Text style={styles.userName}>{user?.name || 'User'} 👋</Text>
+      <View style={styles.content}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.headerText}>
+              Survey says, {user?.name || 'creator name'} is awesome!
+            </Text>
+            <TouchableOpacity style={styles.profileIcon} onPress={handleSignOut}>
+              <Icon name="user" size={20} color="#000000" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </TouchableOpacity>
-        </View>
 
-        {/* Main Content */}
-        <View style={styles.mainContent}>
-          {/* Start with Template Section */}
-          <TouchableOpacity 
-            style={styles.templateSection} 
-            onPress={handleStartWithTemplate}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.templateTitle}>Start with a Template</Text>
-            <Text style={styles.templateSubtitle}>
-              Choose from our popular templates to get started quickly
-            </Text>
-          </TouchableOpacity>
+          {/* Main Content */}
+          <View style={styles.mainContent}>
+            {/* Create Survey Card */}
+            <View style={styles.createSurveyCard}>
+              <View style={styles.cardContent}>
+                <View style={styles.cardTextContainer}>
+                  <Text style={styles.cardTitle}>Create a survey</Text>
+                  <Text style={styles.cardSubtitle}>
+                    Save time with a template{"\n"}or customize your own.
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.cardButton}
+                onPress={handleCreateSurvey}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cardButtonText}>GET STARTED</Text>
+              </TouchableOpacity>
+              <Image
+                source={require('../../assets/q-mark.png')}
+                style={styles.createSurveyImage}
+              />
+            </View>
 
-          {/* Audience Insights Section */}
-          <TouchableOpacity 
-            style={styles.insightsSection} 
-            onPress={handleAudienceInsights}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.insightsTitle}>Audience Insights</Text>
-            <Text style={styles.insightsSubtitle}>
-              See your stats from quizzes in real time
-            </Text>
-          </TouchableOpacity>
+            {/* Audience Insights Card */}
+            <View style={styles.audienceInsightsCard}>
+              <View style={styles.cardContent}>
+                <View style={styles.cardTextContainer}>
+                  <Text style={styles.cardTitle}>Audience Insights</Text>
+                  <Text style={styles.cardSubtitle}>
+                    Understand your audience with detailed{"\n"}demographics and survey data.
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.cardButton}
+                onPress={handleAudienceInsights}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.cardButtonText}>VIEW</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
 
-          {/* Custom Quiz Section */}
-          <TouchableOpacity 
-            style={styles.customSection} 
-            onPress={handleCustomQuiz}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.customTitle}>Custom Quiz</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => handleNavigation('home')}
+        >
+          <Icon name="home" size={24} color="#ffffff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => handleNavigation('create')}
+        >
+          <Icon name="plus" size={24} color="#ffffff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => handleNavigation('insights')}
+        >
+          <Icon name="bar-chart-2" size={24} color="#ffffff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => handleNavigation('bookmarks')}
+        >
+          <Icon name="bookmark" size={24} color="#ffffff" />
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -111,7 +154,10 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7f7', // Light gray background
+    backgroundColor: '#000000',
+  },
+  content: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -122,107 +168,124 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: 24,
+    alignItems: 'center',
+    paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 30,
+    backgroundColor: '#000000',
   },
-  welcomeSection: {
+  headerText: {
+    fontSize: 16,
+    color: '#ffffff',
+    fontWeight: '400',
     flex: 1,
   },
-  greeting: {
-    fontSize: 16,
-    color: '#222121', // Dark Gray/Black text
-    fontWeight: '400',
-  },
-  userName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#222121', // Dark Gray/Black text
-    marginTop: 4,
-  },
-  signOutButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  profileIcon: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    backgroundColor: '#ffffff', // White button
-  },
-  signOutText: {
-    fontSize: 14,
-    color: '#222121', // Dark text
-    fontWeight: '500',
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mainContent: {
+    padding: 30,
+    gap: 20,
+  },
+  createSurveyCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 2,
+    height: screenHeight * 0.25, // Reduced height for mobile
+    justifyContent: 'space-between',
+    position: 'relative',
+  },
+  audienceInsightsCard: {
+    backgroundColor: '#f5f5f5',
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+    height: screenHeight * 0.25, // Reduced height for mobile
+    justifyContent: 'space-between',
+  },
+  cardContent: {
+    flex: 1,
+    justifyContent: 'flex-start',
     paddingHorizontal: 24,
-    gap: 16,
+    paddingTop: 24,
+    paddingBottom: 20,
   },
-  templateSection: {
-    backgroundColor: '#ff004d', // Bright Pink card
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+  cardTextContainer: {
+    alignItems: 'flex-start',
   },
-  templateTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#ffffff', // White text on pink background
-    marginBottom: 8,
+  cardTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: 12,
+    fontFamily: 'System',
   },
-  templateSubtitle: {
+  cardSubtitle: {
     fontSize: 16,
-    color: '#ffffff', // White text on pink background
-    lineHeight: 24,
+    fontWeight: '400',
+    color: '#000000',
+    lineHeight: 22,
+    fontFamily: 'System',
   },
-  insightsSection: {
-    backgroundColor: '#222121', // Dark Gray/Black card
+  cardButton: {
+    borderWidth: 2,
+    borderColor: '#000000',
     borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 24,
+    marginTop: 10,
+    marginBottom: 24,
+    backgroundColor: '#000000',
+    alignSelf: 'flex-start',
   },
-  insightsTitle: {
-    fontSize: 20,
+  cardButtonText: {
+    fontSize: 12,
     fontWeight: '600',
-    color: '#ffffff', // White text on dark background
-    marginBottom: 8,
+    color: '#f5f5f5',
+    letterSpacing: 0.5,
   },
-  insightsSubtitle: {
-    fontSize: 16,
-    color: '#ffffff', // White text on dark background
-    lineHeight: 24,
-  },
-  customSection: {
-    backgroundColor: '#f7fd04', // Bright Yellow card
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#000000',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    justifyContent: 'space-around',
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 100,
+    borderTopWidth: 1,
+    borderTopColor: '#333333',
   },
-  customTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#222121', // Dark text on yellow background
+  createSurveyImage: {
+    width: 100,
+    height: 100,
+    position: 'absolute',
+    bottom: 15,
+    right: 15,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
   },
 });
