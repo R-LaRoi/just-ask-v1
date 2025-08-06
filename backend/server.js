@@ -11,6 +11,11 @@ const app = express();
 app.use(cors()); // Allow requests from your app
 app.use(express.json()); // Allow the server to read JSON from request bodies
 
+// Health check route
+app.get("/", (req, res) => {
+  res.json({ message: "Just Ask API is running!" });
+});
+
 // --- Environment Variables ---
 const uri = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -150,28 +155,28 @@ const authenticateToken = (req, res, next) => {
 
 // --- Onboarding Endpoint ---
 app.patch("/api/users/onboarding", authenticateToken, async (req, res) => {
-  console.log('Onboarding endpoint hit');
-  console.log('Request body:', req.body);
-  console.log('User ID:', req.user.userId);
-  
+  console.log("Onboarding endpoint hit");
+  console.log("Request body:", req.body);
+  console.log("User ID:", req.user.userId);
+
   try {
     const { name, socialHandle, gender, age, location } = req.body;
     const userId = req.user.userId;
 
     if (!name || !socialHandle) {
-      console.log('Missing required fields');
+      console.log("Missing required fields");
       return res
         .status(400)
         .json({ message: "Name and social handle are required" });
     }
 
-    console.log('Connecting to database...');
+    console.log("Connecting to database...");
     // Connect to the database
     await mongoClient.connect();
     const db = mongoClient.db("just_ask_v1");
     const usersCollection = db.collection("users");
 
-    console.log('Updating user...');
+    console.log("Updating user...");
     // Update user with onboarding data
     const result = await usersCollection.findOneAndUpdate(
       { _id: new ObjectId(userId) },
@@ -191,14 +196,14 @@ app.patch("/api/users/onboarding", authenticateToken, async (req, res) => {
       }
     );
 
-    console.log('Update result:', result);
+    console.log("Update result:", result);
 
     if (!result.value) {
-      console.log('User not found');
+      console.log("User not found");
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log('Sending success response');
+    console.log("Sending success response");
     res.status(200).json({
       message: "Profile updated successfully",
       user: {
@@ -279,8 +284,8 @@ app.post("/api/surveys", authenticateToken, async (req, res) => {
     const userId = req.user.userId;
 
     if (!title || !questions || questions.length === 0) {
-      return res.status(400).json({ 
-        message: "Title and at least one question are required" 
+      return res.status(400).json({
+        message: "Title and at least one question are required",
       });
     }
 
@@ -290,14 +295,14 @@ app.post("/api/surveys", authenticateToken, async (req, res) => {
 
     const survey = {
       title,
-      description: description || '',
+      description: description || "",
       questions,
-      estimatedTime: estimatedTime || '2 min',
+      estimatedTime: estimatedTime || "2 min",
       questionCount: questions.length,
       settings: settings || {
         allowBack: true,
         showProgress: true,
-        autoSave: false
+        autoSave: false,
       },
       createdBy: new ObjectId(userId),
       isPublished: true,
@@ -307,13 +312,13 @@ app.post("/api/surveys", authenticateToken, async (req, res) => {
       stats: {
         totalResponses: 0,
         completionRate: 0,
-        averageTime: 0
-      }
+        averageTime: 0,
+      },
     };
 
     const result = await surveysCollection.insertOne(survey);
     const surveyId = result.insertedId.toString();
-    
+
     // Update with share URL
     const shareUrl = `https://justask.app/survey/${surveyId}`;
     await surveysCollection.updateOne(
@@ -321,15 +326,16 @@ app.post("/api/surveys", authenticateToken, async (req, res) => {
       { $set: { shareUrl } }
     );
 
-    console.log('✅ Survey created successfully:', { surveyId, title });
+    console.log("✅ Survey created successfully:", { surveyId, title });
 
     res.status(201).json({
       message: "Survey created successfully",
       surveyId,
       shareUrl,
-      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`
+      qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+        shareUrl
+      )}`,
     });
-
   } catch (error) {
     console.error("Error creating survey:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -351,7 +357,6 @@ app.get("/api/surveys", authenticateToken, async (req, res) => {
       .toArray();
 
     res.json({ surveys });
-
   } catch (error) {
     console.error("Error fetching surveys:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -373,11 +378,13 @@ app.get("/api/surveys/:surveyId/public", async (req, res) => {
 
     const survey = await surveysCollection.findOne({
       _id: new ObjectId(surveyId),
-      isPublished: true
+      isPublished: true,
     });
 
     if (!survey) {
-      return res.status(404).json({ message: "Survey not found or not published" });
+      return res
+        .status(404)
+        .json({ message: "Survey not found or not published" });
     }
 
     // Return only public data (no creator info)
@@ -388,11 +395,10 @@ app.get("/api/surveys/:surveyId/public", async (req, res) => {
       questions: survey.questions,
       estimatedTime: survey.estimatedTime,
       questionCount: survey.questionCount,
-      settings: survey.settings
+      settings: survey.settings,
     };
 
     res.json({ survey: publicSurvey });
-
   } catch (error) {
     console.error("Error fetching public survey:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -421,11 +427,13 @@ app.post("/api/surveys/:surveyId/responses", async (req, res) => {
     // Verify survey exists and is published
     const survey = await surveysCollection.findOne({
       _id: new ObjectId(surveyId),
-      isPublished: true
+      isPublished: true,
     });
 
     if (!survey) {
-      return res.status(404).json({ message: "Survey not found or not published" });
+      return res
+        .status(404)
+        .json({ message: "Survey not found or not published" });
     }
 
     // Save response
@@ -435,33 +443,35 @@ app.post("/api/surveys/:surveyId/responses", async (req, res) => {
       completedAt: completedAt ? new Date(completedAt) : new Date(),
       timeSpent: timeSpent || 0,
       submittedAt: new Date(),
-      ipAddress: req.ip || req.connection.remoteAddress
+      ipAddress: req.ip || req.connection.remoteAddress,
     };
 
     await responsesCollection.insertOne(response);
 
     // Update survey stats
     const totalResponses = await responsesCollection.countDocuments({
-      surveyId: new ObjectId(surveyId)
+      surveyId: new ObjectId(surveyId),
     });
 
     await surveysCollection.updateOne(
       { _id: new ObjectId(surveyId) },
-      { 
-        $set: { 
-          'stats.totalResponses': totalResponses,
-          updatedAt: new Date()
-        }
+      {
+        $set: {
+          "stats.totalResponses": totalResponses,
+          updatedAt: new Date(),
+        },
       }
     );
 
-    console.log('✅ Survey response submitted:', { surveyId, responseCount: totalResponses });
-
-    res.status(201).json({ 
-      message: "Response submitted successfully",
-      responseId: response._id
+    console.log("✅ Survey response submitted:", {
+      surveyId,
+      responseCount: totalResponses,
     });
 
+    res.status(201).json({
+      message: "Response submitted successfully",
+      responseId: response._id,
+    });
   } catch (error) {
     console.error("Error submitting response:", error);
     res.status(500).json({ message: "Internal server error" });
