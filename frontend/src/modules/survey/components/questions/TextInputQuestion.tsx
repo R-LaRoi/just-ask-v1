@@ -83,19 +83,28 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   textInput: {
-    backgroundColor: '#F9FAFB',
-    borderWidth: 2,
-    borderColor: '#667eea', // Changed from '#E5E7EB' to make it more visible
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    borderWidth: 0.5,
+    borderColor: '#292929',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     fontSize: 16,
-    color: '#374151',
+    color: '#333333',
     minHeight: 56,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   longTextInput: {
     minHeight: 120,
     paddingTop: 16,
+    borderRadius: 20, // Slightly less rounded for long text
+    textAlignVertical: 'top',
   },
   helpText: {
     fontSize: 14,

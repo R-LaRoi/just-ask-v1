@@ -95,7 +95,7 @@ export default function OnboardingScreen({ navigation }: any) {
       {/* Ask-still image at the top */}
       <View style={styles.imageContainer}>
         <Image
-          source={require('../../../assets/ask-still.png')}
+          source={require('../../../assets/blocks.png')}
           style={styles.topImage}
           resizeMode="contain"
         />

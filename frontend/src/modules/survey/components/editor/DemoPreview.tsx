@@ -8,13 +8,14 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
+import Video from 'react-native-video';
 import { useSurveyEditorStore } from '../../stores/surveyEditorStore';
 import { useEditorStore } from '../../stores/editorStore';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { SurveyTemplate } from '../../types/survey';
 import QuestionRenderer from '../QuestionRenderer';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 interface DemoPreviewProps {
   template: SurveyTemplate;
@@ -77,21 +78,10 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
   };
 
   const handleNext = () => {
-    const nextIndex = currentQuestionIndex + 1;
-    if (nextIndex >= questions.length) {
-      setIsCompleted(true);
-      if (useEditorStoreProp) {
-        // editorStore doesn't have completeDemo
-      } else {
-        surveyEditorStore.completeDemo();
-      }
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      setCurrentQuestionIndex(nextIndex);
-      if (useEditorStoreProp) {
-        editorStore.nextDemoQuestion();
-      } else {
-        surveyEditorStore.nextDemoQuestion();
-      }
+      setIsCompleted(true);
     }
   };
 
@@ -107,34 +97,37 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
 
   if (isCompleted) {
     return (
-      <View style={styles.completionContainer}>
-        <LinearGradient
-          colors={['#667eea', '#764ba2']}
-          style={styles.completionGradient}
-        >
-          <View style={styles.demoIndicator}>
-            <View style={styles.demoAvatar}>
-              <Text style={styles.demoAvatarText}>👤</Text>
-            </View>
-            <Text style={styles.demoLabel}>DEMO MODE</Text>
+      <View style={styles.container}>
+        {/* Video Background */}
+        <Video
+          source={{ uri: 'https://res.cloudinary.com/do5wpgk5o/video/upload/v1754402003/ask-vid-blk_lly43z.mp4' }}
+          style={styles.backgroundVideo}
+          resizeMode="cover"
+          repeat={true}
+          muted={true}
+          playInBackground={false}
+          playWhenInactive={false}
+        />
+
+        {/* Content Overlay */}
+        <View style={styles.overlay}>
+          <View style={styles.completionContent}>
+            <Text style={styles.completionTitle}>Thank you!</Text>
+            <Text style={styles.completionSubtitle}>
+              You've completed the survey demo
+            </Text>
+            <Text style={styles.completionDescription}>
+              {answers.length} of {questions.length} questions answered
+            </Text>
+
+            <TouchableOpacity
+              style={styles.returnButton}
+              onPress={onComplete}
+            >
+              <Text style={styles.returnButtonText}>Return to Editor</Text>
+            </TouchableOpacity>
           </View>
-
-          <Text style={styles.completionIcon}>🎉</Text>
-          <Text style={styles.completionTitle}>Thank you!</Text>
-          <Text style={styles.completionSubtitle}>
-            You've completed the survey demo
-          </Text>
-          <Text style={styles.completionStats}>
-            {answers.length} of {questions.length} questions answered
-          </Text>
-
-          <TouchableOpacity
-            style={styles.returnButton}
-            onPress={onComplete}
-          >
-            <Text style={styles.returnButtonText}>Return to Editor</Text>
-          </TouchableOpacity>
-        </LinearGradient>
+        </View>
       </View>
     );
   }
@@ -183,7 +176,7 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
 
       {/* Question Content */}
       <ScrollView
-        style={styles.content}
+        style={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -235,16 +228,17 @@ export default function DemoPreview({ template, onComplete, useEditorStore: useE
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff', // Back to white
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ffffff',
   },
   loadingText: {
     fontSize: 18,
-    color: '#6B7280',
+    color: '#666666',
     fontWeight: '500',
   },
   header: {
@@ -253,45 +247,51 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#ffffff',
   },
   backButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderWidth: 0.5,
+    borderColor: '#292929',
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   disabledBackButton: {
-    backgroundColor: '#F3F4F6',
-    borderColor: '#E5E7EB',
+    backgroundColor: '#f7f7f7',
+    borderColor: '#f7f7f7',
   },
   backButtonText: {
     fontSize: 20,
-    color: '#374151',
+    color: '#333333',
     fontWeight: '600',
   },
   disabledBackButtonText: {
-    color: '#9CA3AF',
+    color: '#666666',
   },
   questionInfo: {
     alignItems: 'flex-end',
   },
   questionCounter: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#666666',
     fontWeight: '600',
   },
   demoIndicatorSmall: {
     marginTop: 4,
     backgroundColor: '#EF4444',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
     borderRadius: 4,
   },
   demoLabelSmall: {
@@ -302,91 +302,108 @@ const styles = StyleSheet.create({
   progressContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    backgroundColor: '#ffffff',
   },
   progressBackground: {
     height: 6,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#f0f0f0',
     borderRadius: 3,
     marginBottom: 8,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#667eea',
+    backgroundColor: '#000000',
     borderRadius: 3,
   },
-  content: {
+  completionContent: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+
+  scrollViewContainer: {
+    flex: 1,
+    backgroundColor: '#ffffff',
   },
   scrollContent: {
-    padding: 24,
+    padding: 20,
     paddingBottom: 100,
+    // Remove justifyContent: 'center' and alignItems: 'center' to restore original spacing
   },
   questionContainer: {
     marginBottom: 32,
   },
   questionTitle: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#111827',
+    fontWeight: 'bold',
+    color: '#333333',
     lineHeight: 36,
     marginBottom: 12,
+    textAlign: 'center',
   },
   questionDescription: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#666666',
     lineHeight: 24,
+    textAlign: 'center',
+    marginBottom: 20,
   },
   footer: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    backgroundColor: '#ffffff',
   },
   footerText: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: '#666666',
     textAlign: 'center',
     fontStyle: 'italic',
   },
   continueButton: {
-    backgroundColor: '#667eea',
+    backgroundColor: '#f7fd04',
+    borderRadius: 25,
     paddingVertical: 18,
-    borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#667eea',
+    marginTop: 20,
+    shadowColor: '#000000',
     shadowOffset: {
       width: 0,
       height: 4,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   disabledButton: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#f0f0f0',
     shadowOpacity: 0,
     elevation: 0,
   },
   continueButtonText: {
-    color: '#FFFFFF',
+    color: '#222121',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
   disabledButtonText: {
-    color: '#9CA3AF',
+    color: '#666666',
   },
   completionContainer: {
     flex: 1,
+    backgroundColor: '#000000',
   },
-  completionGradient: {
+  backgroundVideo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    width: width,
+    height: height,
+  },
+  overlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   demoIndicator: {
     position: 'absolute',
@@ -426,42 +443,55 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     textAlign: 'center',
   },
-  completionIcon: {
-    fontSize: 64,
-    marginBottom: 24,
-  },
   completionTitle: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 16,
     textAlign: 'center',
-    marginBottom: 12,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   completionSubtitle: {
     fontSize: 18,
-    color: '#E0E7FF',
+    color: '#ffffff',
+    marginBottom: 20,
     textAlign: 'center',
-    marginBottom: 24,
+    lineHeight: 24,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
-  completionStats: {
+  completionDescription: {
     fontSize: 16,
-    color: '#C7D2FE',
+    color: '#ffffff',
+    marginBottom: 40,
     textAlign: 'center',
-    fontWeight: '500',
+    lineHeight: 22,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   returnButton: {
-    marginTop: 32,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: '#f7fd04',
+    borderRadius: 25,
+    paddingVertical: 18,
+    paddingHorizontal: 40,
+    alignItems: 'center',
+    minWidth: 200,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
   returnButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    color: '#222121',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });

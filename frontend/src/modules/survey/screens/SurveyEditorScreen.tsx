@@ -307,9 +307,9 @@ export default function SurveyEditorScreen() {
             <Text style={styles.modalTitle}>Add Question</Text>
 
             {[
-              { type: 'multiple_choice', icon: 'MC', title: 'Multiple Choice', desc: 'Single or multiple selection' },
-              { type: 'text_input', icon: 'TXT', title: 'Text Input', desc: 'Short or long text response' },
-              { type: 'rating', icon: 'RATE', title: 'Rating', desc: 'Star rating or number scale' }
+              { type: 'multiple_choice', title: 'Multiple Choice', desc: 'Single or multiple selection' },
+              { type: 'text_input', title: 'Text Input', desc: 'Short or long text response' },
+              { type: 'rating', title: 'Rating', desc: 'Star rating or number scale' }
             ].map((questionType) => (
               <TouchableOpacity
                 key={questionType.type}
@@ -319,7 +319,6 @@ export default function SurveyEditorScreen() {
                   setShowQuestionTypes(false);
                 }}
               >
-                <Text style={styles.questionTypeIcon}>{questionType.icon}</Text>
                 <View style={styles.questionTypeInfo}>
                   <Text style={styles.questionTypeTitle}>{questionType.title}</Text>
                   <Text style={styles.questionTypeDesc}>{questionType.desc}</Text>

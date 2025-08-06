@@ -67,47 +67,58 @@ export default function MultipleChoiceQuestion({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 32,
+    marginTop: 20,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     marginBottom: 12,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
+    backgroundColor: '#ffffff',
+    borderRadius: 25,
+    borderWidth: 0.5,
+    borderColor: '#292929',
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   selectedOption: {
-    backgroundColor: '#EEF2FF',
-    borderColor: '#667eea',
+    backgroundColor: '#f7fd04',
+    borderColor: '#292929',
   },
   booleanOption: {
-    paddingVertical: 24,
+    paddingVertical: 18,
   },
   indicator: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: '#292929',
     marginRight: 16,
+    backgroundColor: '#ffffff',
   },
   selectedIndicator: {
-    backgroundColor: '#667eea',
-    borderColor: '#667eea',
+    backgroundColor: '#222121',
+    borderColor: '#222121',
   },
   checkboxIndicator: {
     borderRadius: 4,
   },
   optionText: {
     fontSize: 16,
-    color: '#374151',
+    color: '#333333',
     flex: 1,
+    fontWeight: '500',
   },
   selectedOptionText: {
-    color: '#667eea',
+    color: '#222121',
     fontWeight: '600',
   },
 });

@@ -13,6 +13,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SurveyTemplate } from '../../types/survey';
 import DemoPreview from './DemoPreview';
+import { MaterialIcons } from '@expo/vector-icons'; // Replace this line
 
 const { width } = Dimensions.get('window');
 
@@ -28,7 +29,12 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
   const [isSaving, setIsSaving] = useState(false);
   const [showDemo, setShowDemo] = useState(false);
   const [shareUrl, setShareUrl] = useState(`https://justask.app/survey/${template.id}`);
-  const { saveSurvey } = useSurveyEditorStore();
+  const { saveSurvey, initializeEditor } = useSurveyEditorStore();
+
+  // Initialize the store with template data when component mounts
+  React.useEffect(() => {
+    initializeEditor(template);
+  }, [template, initializeEditor]);
 
   const handleSave = async () => {
     try {
@@ -48,6 +54,7 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
         [{ text: 'OK' }]
       );
     } catch (error) {
+      console.error('Error saving survey:', error);
       Alert.alert(
         'Save Failed',
         'There was an error saving your survey. Please try again.',
@@ -62,30 +69,20 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
     setShowDemo(true);
   };
 
-  const handleDemoComplete = () => {
-    setShowDemo(false);
-    Alert.alert(
-      'Demo Completed! 🎉',
-      'You\'ve successfully tested your survey. Ready to share it with others?',
-      [{ text: 'OK' }]
-    );
-  };
-
   const handleCopyLink = async () => {
     try {
-      // Temporary fallback - you can implement proper clipboard later
-      Alert.alert('Copy Link', `Survey link: ${shareUrl}\n\nPlease copy this link manually.`);
+      // await Clipboard.setString(shareUrl);
+      Alert.alert('Link Copied', 'Survey link copied to clipboard!');
     } catch (error) {
-      Alert.alert('Copy Failed', 'Unable to copy link to clipboard.');
+      console.error('Error copying link:', error);
     }
   };
 
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `Check out my survey: ${template.title}\n\n${shareUrl}`,
+        message: `Check out this survey: ${shareUrl}`,
         url: shareUrl,
-        title: template.title,
       });
     } catch (error) {
       console.error('Error sharing:', error);
@@ -93,29 +90,19 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
   };
 
   const renderQuestionPreview = (question: any, index: number) => {
-    const getQuestionTypeIcon = (type: string) => {
-      switch (type) {
-        case 'multiple_choice': return 'MC';
-        case 'text_input': return 'TXT';
-        case 'rating': return 'RATE';
-        case 'slider': return 'SLIDE';
-        case 'date': return 'DATE';
-        case 'file_upload': return 'FILE';
-        default: return '?';
-      }
-    };
+    const maxOptionsToShow = 3;
+    const hasMoreOptions = question.options && question.options.length > maxOptionsToShow;
+    const optionsToShow = question.options ? question.options.slice(0, maxOptionsToShow) : [];
 
     return (
-      <View key={question.id} style={styles.questionPreview}>
+      <View key={question.id || index} style={styles.questionPreview}>
         <View style={styles.questionHeader}>
           <View style={styles.questionNumber}>
             <Text style={styles.questionNumberText}>{index + 1}</Text>
           </View>
           <View style={styles.questionInfo}>
             <View style={styles.questionTitleRow}>
-              <Text style={styles.questionTypeIcon}>
-                {getQuestionTypeIcon(question.type)}
-              </Text>
+              <Text style={styles.questionTypeIcon}>📝</Text>
               <Text style={styles.questionTitle}>{question.title}</Text>
               {question.required && (
                 <Text style={styles.requiredBadge}>Required</Text>
@@ -127,17 +114,18 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
           </View>
         </View>
 
-        {question.options && (
+        {/* Options Preview */}
+        {question.options && question.options.length > 0 && (
           <View style={styles.optionsPreview}>
-            {question.options.slice(0, 3).map((option: string, optIndex: number) => (
-              <View key={optIndex} style={styles.optionItem}>
+            {optionsToShow.map((option: any, optionIndex: number) => (
+              <View key={optionIndex} style={styles.optionItem}>
                 <Text style={styles.optionBullet}>•</Text>
-                <Text style={styles.optionText}>{option}</Text>
+                <Text style={styles.optionText}>{option.text || option}</Text>
               </View>
             ))}
-            {question.options.length > 3 && (
+            {hasMoreOptions && (
               <Text style={styles.moreOptions}>
-                +{question.options.length - 3} more options
+                +{question.options.length - maxOptionsToShow} more options
               </Text>
             )}
           </View>
@@ -146,7 +134,6 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
     );
   };
 
-  // If demo is active, show demo screen
   if (showDemo) {
     return (
       <View style={styles.container}>
@@ -155,27 +142,21 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
             style={styles.backToDemoButton}
             onPress={() => setShowDemo(false)}
           >
-            <Text style={styles.backToDemoButtonText}>← Back to Review</Text>
+            <Text style={styles.backToDemoButtonText}>← Back</Text>
           </TouchableOpacity>
-          <Text style={styles.demoTitle}>Survey Demo</Text>
+          <Text style={styles.demoTitle}>Demo Preview</Text>
         </View>
-        <DemoPreview
-          template={template}
-          onComplete={handleDemoComplete}
-          useEditorStore={false}
-        />
+        <DemoPreview template={template} onComplete={() => setShowDemo(false)} />
       </View>
     );
   }
 
-  // Main review screen
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView}>
         {/* Survey Overview */}
         <View style={styles.overviewSection}>
           <View style={styles.surveyHeader}>
-            <Text style={styles.surveyIcon}>{template.icon}</Text>
             <View style={styles.surveyInfo}>
               <Text style={styles.surveyTitle}>{template.title}</Text>
               <Text style={styles.surveyDescription}>{template.description}</Text>
@@ -185,14 +166,17 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
             </TouchableOpacity>
           </View>
 
+          {/* Survey Stats */}
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{template.questionCount}</Text>
+              <Text style={styles.statValue}>{template.questions.length}</Text>
               <Text style={styles.statLabel}>Questions</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{template.estimatedTime}</Text>
-              <Text style={styles.statLabel}>Est. Time</Text>
+              <Text style={styles.statValue}>
+                {Math.ceil(template.questions.length * 0.5)}
+              </Text>
+              <Text style={styles.statLabel}>Est. Minutes</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>
@@ -254,35 +238,33 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
         </View>
       </ScrollView>
 
-      {/* Bottom Action Bar - Mobile First */}
-      <View style={styles.bottomBar}>
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
         <TouchableOpacity
-          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+          style={styles.navItem}
+          onPress={handleStartDemo}
+        >
+          <MaterialIcons name="play-arrow" size={24} color="#ffffff" />
+          <Text style={styles.navLabel}>Demo</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.navItem, isSaving && styles.navItemDisabled]}
           onPress={handleSave}
           disabled={isSaving}
         >
-          <LinearGradient
-            colors={isSaving ? ['#9CA3AF', '#6B7280'] : ['#667eea', '#764ba2']}
-            style={styles.saveButtonGradient}
-          >
-            <Text style={styles.saveButtonText}>
-              {isSaving ? 'Saving...' : 'Save & Publish'}
-            </Text>
-          </LinearGradient>
+          <MaterialIcons name="bookmark" size={24} color={isSaving ? "#666666" : "#ffffff"} />
+          <Text style={[styles.navLabel, isSaving && styles.navLabelDisabled]}>
+            {isSaving ? 'Saving...' : 'Save'}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.demoBottomButton}
-          onPress={handleStartDemo}
-        >
-          <Text style={styles.demoBottomButtonText}>▶️ Test Demo</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.editBottomButton}
+          style={styles.navItem}
           onPress={onEdit}
         >
-          <Text style={styles.editBottomButtonText}>Edit Survey</Text>
+          <MaterialIcons name="edit" size={24} color="#ffffff" />
+          <Text style={styles.navLabel}>Edit</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -292,25 +274,24 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    backgroundColor: 'rgba(15, 15, 15, 1)',
   },
   scrollView: {
     flex: 1,
   },
-  // Demo-specific styles
   demoHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderBottomWidth: 1,
     borderBottomColor: '#ffffff',
   },
   backToDemoButton: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderRadius: 8,
     marginRight: 16,
     borderWidth: 1,
@@ -319,19 +300,18 @@ const styles = StyleSheet.create({
   backToDemoButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ffffff', // Changed from #374151 to white
+    color: '#ffffff',
   },
   demoTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#ffffff', // Changed from #111827 to white
+    color: '#ffffff',
   },
-  // Existing styles
   overviewSection: {
     padding: 24,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderBottomWidth: 1,
-    borderBottomColor: '#ffffff', // Changed from #F3F4F6 to white
+    borderBottomColor: '#ffffff',
   },
   surveyHeader: {
     flexDirection: 'row',
@@ -348,12 +328,12 @@ const styles = StyleSheet.create({
   surveyTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#ffffff', // Changed from #111827 to white
+    color: '#ffffff',
     marginBottom: 4,
   },
   surveyDescription: {
     fontSize: 16,
-    color: '#cccccc', // Changed from #6B7280 to light gray
+    color: '#cccccc',
     lineHeight: 24,
   },
   editButton: {
@@ -367,14 +347,14 @@ const styles = StyleSheet.create({
   editButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ffffff', // Changed from #374151 to white
+    color: '#ffffff',
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#ffffff', // Changed from #F3F4F6 to white
+    borderTopColor: '#ffffff',
   },
   statItem: {
     alignItems: 'center',
@@ -382,26 +362,26 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#ffffff', // Changed from '#f7fd04' to white
+    color: '#ffffff',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#ffffff', // Changed from '#cccccc' to white
+    color: '#ffffff',
     fontWeight: '500',
   },
   questionsSection: {
     padding: 24,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    backgroundColor: 'rgba(15, 15, 15, 1)',
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#ffffff', // Changed from #111827 to white
+    color: '#ffffff',
     marginBottom: 16,
   },
   questionPreview: {
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -416,7 +396,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#ffffff', // Changed from '#f7fd04' to white
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -424,7 +404,7 @@ const styles = StyleSheet.create({
   questionNumberText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#000000', // Keeping black for contrast with white background
+    color: '#000000',
   },
   questionInfo: {
     flex: 1,
@@ -436,29 +416,29 @@ const styles = StyleSheet.create({
   },
   questionTypeIcon: {
     fontSize: 16,
-    // Remove marginRight: 8,
+    marginRight: 8,
   },
   questionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ffffff', // Changed from #111827 to white
+    color: '#ffffff',
     flex: 1,
   },
   requiredBadge: {
     fontSize: 10,
     fontWeight: '600',
     color: '#EF4444',
-    backgroundColor: '#2a1a1a', // Changed from #FEF2F2 to dark background
+    backgroundColor: '#2a1a1a',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 8,
     marginLeft: 8,
     borderWidth: 1,
-    borderColor: '#EF4444', // Added red border
+    borderColor: '#EF4444',
   },
   questionDescription: {
     fontSize: 14,
-    color: '#cccccc', // Changed from #6B7280 to light gray
+    color: '#cccccc',
     lineHeight: 20,
   },
   optionsPreview: {
@@ -472,22 +452,22 @@ const styles = StyleSheet.create({
   },
   optionBullet: {
     fontSize: 16,
-    color: '#ffffff', // Changed from #9CA3AF to white
+    color: '#ffffff',
     marginRight: 8,
   },
   optionText: {
     fontSize: 14,
-    color: '#cccccc', // Changed from #374151 to light gray
+    color: '#cccccc',
   },
   moreOptions: {
     fontSize: 12,
-    color: '#cccccc', // Changed from #6B7280 to light gray
+    color: '#cccccc',
     fontStyle: 'italic',
     marginTop: 4,
   },
   sharingSection: {
     padding: 24,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    backgroundColor: 'rgba(15, 15, 15, 1)',
   },
   linkContainer: {
     marginBottom: 24,
@@ -495,13 +475,13 @@ const styles = StyleSheet.create({
   linkLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ffffff', // Changed from #374151 to white
+    color: '#ffffff',
     marginBottom: 8,
   },
   linkRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(55, 55, 55, 0.72)',
@@ -511,19 +491,19 @@ const styles = StyleSheet.create({
   linkText: {
     flex: 1,
     fontSize: 14,
-    color: '#cccccc', // Changed from #6B7280 to light gray
+    color: '#cccccc',
     marginRight: 12,
   },
   copyButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#f7fd04', // Changed to your progress color
+    backgroundColor: '#f7fd04',
     borderRadius: 6,
   },
   copyButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#000000', // Changed to black for contrast
+    color: '#000000',
   },
   qrSection: {
     marginBottom: 24,
@@ -531,13 +511,13 @@ const styles = StyleSheet.create({
   qrLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ffffff', // Changed from #374151 to white
+    color: '#ffffff',
     marginBottom: 8,
   },
   qrContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #1a1a1a
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(55, 55, 55, 0.72)',
@@ -555,17 +535,17 @@ const styles = StyleSheet.create({
   qrText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#ffffff', // Changed from #374151 to white
+    color: '#ffffff',
     marginBottom: 4,
   },
   qrSubtext: {
     fontSize: 12,
-    color: '#cccccc', // Changed from #6B7280 to light gray
+    color: '#cccccc',
   },
   downloadQrButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
+    backgroundColor: 'rgba(15, 15, 15, 1)',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'rgba(55, 55, 55, 0.72)',
@@ -573,7 +553,7 @@ const styles = StyleSheet.create({
   downloadQrText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#ffffff', // Changed from #374151 to white
+    color: '#ffffff',
   },
   shareActions: {
     flexDirection: 'row',
@@ -607,61 +587,32 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
   },
-  bottomBar: {
-    flexDirection: 'column',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(15, 15, 15, 1)',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
     paddingBottom: 34,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #0b0b0b
+    justifyContent: 'space-around',
+    alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#ffffff',
-    gap: 12,
   },
-  editBottomButton: {
-    width: '100%',
-    paddingVertical: 16,
-    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #333333
-    borderRadius: 12,
+  navItem: {
+    flex: 1,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(55, 55, 55, 0.72)',
+    paddingVertical: 10,
   },
-  editBottomButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff', // Changed from #374151 to white
+  navItemDisabled: {
+    opacity: 0.5,
   },
-  demoBottomButton: {
-    width: '100%',
-    paddingVertical: 16,
-    backgroundColor: '#10B981',
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
+  navLabel: {
+    fontSize: 12,
+    color: '#ffffff',
+    marginTop: 4,
+    fontWeight: '500',
   },
-  demoBottomButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  saveButton: {
-    width: '100%',
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #ffffff
-  },
-  saveButtonDisabled: {
-    opacity: 0.7,
-  },
-  saveButtonGradient: {
-    paddingVertical: 18, // Slightly larger for primary action
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
+  navLabelDisabled: {
+    color: '#666666',
   },
 });
