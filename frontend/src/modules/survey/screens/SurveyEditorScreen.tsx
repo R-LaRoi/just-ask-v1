@@ -126,7 +126,7 @@ export default function SurveyEditorScreen() {
             style={styles.editButton}
             onPress={handleStopDemo}
           >
-            <Text style={styles.editButtonText}>✏️ Edit</Text>
+            <Text style={styles.editButtonText}>Edit</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -307,9 +307,9 @@ export default function SurveyEditorScreen() {
             <Text style={styles.modalTitle}>Add Question</Text>
 
             {[
-              { type: 'multiple_choice', icon: '☑️', title: 'Multiple Choice', desc: 'Single or multiple selection' },
-              { type: 'text_input', icon: '📝', title: 'Text Input', desc: 'Short or long text response' },
-              { type: 'rating', icon: '⭐', title: 'Rating', desc: 'Star rating or number scale' }
+              { type: 'multiple_choice', icon: 'MC', title: 'Multiple Choice', desc: 'Single or multiple selection' },
+              { type: 'text_input', icon: 'TXT', title: 'Text Input', desc: 'Short or long text response' },
+              { type: 'rating', icon: 'RATE', title: 'Rating', desc: 'Star rating or number scale' }
             ].map((questionType) => (
               <TouchableOpacity
                 key={questionType.type}
@@ -548,22 +548,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 20,
     paddingHorizontal: 24,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #F9FAFB
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: 'rgba(55, 55, 55, 0.72)', // Changed from #E5E7EB
     borderStyle: 'dashed',
     marginTop: 16,
   },
   addQuestionIcon: {
     fontSize: 24,
-    color: '#667eea',
+    color: '#ffffff', // Changed from #667eea
     marginRight: 8,
   },
   addQuestionText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#667eea',
+    color: '#ffffff', // Changed from #667eea
   },
   modalOverlay: {
     flex: 1,
@@ -627,17 +627,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     paddingBottom: 34, // Extra padding for safe area
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(15, 15, 15, 1)', // Changed from #FFFFFF
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: 'rgba(55, 55, 55, 0.72)', // Changed from #E5E7EB
   },
   saveButton: {
     width: '100%',
     paddingVertical: 18,
-    backgroundColor: '#667eea',
+    backgroundColor: '#f7fd04', // Changed from #667eea to match your theme
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#667eea',
+    shadowColor: '#f7fd04',
     shadowOffset: {
       width: 0,
       height: 4,
@@ -649,6 +649,6 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#000000', // Changed from #FFFFFF to black for contrast with yellow
   },
 });

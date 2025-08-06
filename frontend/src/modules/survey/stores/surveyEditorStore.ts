@@ -55,7 +55,7 @@ const DEFAULT_TEMPLATE: SurveyTemplate = {
   title: 'Custom Survey',
   description: '3 questions • 2 min',
   completionRate: '0% completion rate',
-  icon: '📝',
+  icon: '', // Removed 📝
   estimatedTime: '2 min',
   questionCount: 3,
   questions: [
@@ -309,24 +309,23 @@ export const useSurveyEditorStore = create<SurveyEditorState>((set, get) => ({
         }
       };
 
-      console.log('🚀 Saving survey to backend...', surveyData);
-      const response = await apiService.createSurvey(surveyData);
-      console.log('✅ Survey saved successfully:', response);
-      
+      console.log('Saving survey to backend...', surveyData);
+      const response = await apiService.saveSurvey(surveyData);
+      console.log('Survey saved successfully:', response);
       return response;
     } catch (error) {
-      console.error('❌ Error saving survey:', error);
+      console.error('Error saving survey:', error);
       throw error;
     }
   },
-  
+
   deleteQuestion: (questionId) => {
-    console.log('🗑️ surveyEditorStore deleteQuestion called with:', questionId);
+    console.log('surveyEditorStore deleteQuestion called with:', questionId);
     const { questions } = get();
-    console.log('📋 Current questions before delete:', questions.map(q => ({ id: q.id, title: q.title })));
+    console.log('Current questions before delete:', questions.map(q => ({ id: q.id, title: q.title })));
     
     const updatedQuestions = questions.filter(q => q.id !== questionId);
-    console.log('📋 Updated questions after filter:', updatedQuestions.map(q => ({ id: q.id, title: q.title })));
+    console.log('Updated questions after filter:', updatedQuestions.map(q => ({ id: q.id, title: q.title })));
     
     set({ 
       questions: updatedQuestions,
@@ -334,7 +333,7 @@ export const useSurveyEditorStore = create<SurveyEditorState>((set, get) => ({
       editingOptionId: null 
     });
     
-    console.log('✅ surveyEditorStore deleteQuestion completed');
+    console.log('surveyEditorStore deleteQuestion completed');
     get().resetDemo();
   },
 }));

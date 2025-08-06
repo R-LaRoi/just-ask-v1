@@ -68,7 +68,8 @@ export default function QuestionEditor({ question, questionIndex, isLast, useEdi
   };
 
   const handleRemoveOption = (optionIndex: number) => {
-    console.log('🗑️ QuestionEditor handleRemoveOption called:', {
+    // Replace all console.log statements to remove emojis:
+    console.log('QuestionEditor handleRemoveOption called:', {
       optionIndex,
       questionId: question.id,
       optionsLength: question.options?.length,

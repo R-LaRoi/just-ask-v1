@@ -43,7 +43,7 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
       }
 
       Alert.alert(
-        'Survey Saved! 🎉',
+        'Survey Saved!',
         'Your survey has been saved successfully and is ready to share.',
         [{ text: 'OK' }]
       );
@@ -95,13 +95,13 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
   const renderQuestionPreview = (question: any, index: number) => {
     const getQuestionTypeIcon = (type: string) => {
       switch (type) {
-        case 'multiple_choice': return '☑️';
-        case 'text_input': return '📝';
-        case 'rating': return '⭐';
-        case 'slider': return '🎚️';
-        case 'date': return '📅';
-        case 'file_upload': return '📎';
-        default: return '❓';
+        case 'multiple_choice': return 'MC';
+        case 'text_input': return 'TXT';
+        case 'rating': return 'RATE';
+        case 'slider': return 'SLIDE';
+        case 'date': return 'DATE';
+        case 'file_upload': return 'FILE';
+        default: return '?';
       }
     };
 
@@ -181,7 +181,7 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
               <Text style={styles.surveyDescription}>{template.description}</Text>
             </View>
             <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-              <Text style={styles.editButtonText}>✏️ Edit</Text>
+              <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
           </View>
 
@@ -221,7 +221,7 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
             <View style={styles.linkRow}>
               <Text style={styles.linkText} numberOfLines={1}>{shareUrl}</Text>
               <TouchableOpacity style={styles.copyButton} onPress={handleCopyLink}>
-                <Text style={styles.copyButtonText}>📋 Copy</Text>
+                <Text style={styles.copyButtonText}>Copy</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -231,12 +231,12 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
             <Text style={styles.qrLabel}>QR Code</Text>
             <View style={styles.qrContainer}>
               <View style={styles.qrPlaceholder}>
-                <Text style={styles.qrIcon}>📱</Text>
+                <Text style={styles.qrIcon}>QR</Text>
                 <Text style={styles.qrText}>QR Code</Text>
                 <Text style={styles.qrSubtext}>Scan to access survey</Text>
               </View>
               <TouchableOpacity style={styles.downloadQrButton}>
-                <Text style={styles.downloadQrText}>💾 Download</Text>
+                <Text style={styles.downloadQrText}>Download</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -244,11 +244,11 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
           {/* Share Actions */}
           <View style={styles.shareActions}>
             <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-              <Text style={styles.shareButtonText}>📤 Share Link</Text>
+              <Text style={styles.shareButtonText}>Share Link</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.embedButton}>
-              <Text style={styles.embedButtonText}>🔗 Embed Code</Text>
+              <Text style={styles.embedButtonText}>Embed Code</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -266,7 +266,7 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
             style={styles.saveButtonGradient}
           >
             <Text style={styles.saveButtonText}>
-              {isSaving ? '💾 Saving...' : '🚀 Save & Publish'}
+              {isSaving ? 'Saving...' : 'Save & Publish'}
             </Text>
           </LinearGradient>
         </TouchableOpacity>
@@ -282,7 +282,7 @@ export default function SurveyReview({ template, onEdit, onSave }: SurveyReviewP
           style={styles.editBottomButton}
           onPress={onEdit}
         >
-          <Text style={styles.editBottomButtonText}>✏️ Edit Survey</Text>
+          <Text style={styles.editBottomButtonText}>Edit Survey</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   },
   questionTypeIcon: {
     fontSize: 16,
-    marginRight: 8,
+    // Remove marginRight: 8,
   },
   questionTitle: {
     fontSize: 16,

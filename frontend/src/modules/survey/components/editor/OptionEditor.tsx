@@ -114,7 +114,7 @@ export default function OptionEditor({
                 onPress={handleCancel}
                 activeOpacity={0.7}
               >
-                <Text style={styles.cancelButtonText}>✕</Text>
+                <Text style={styles.cancelButtonText}>×</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.saveButton}

@@ -12,6 +12,7 @@ interface SurveysResponse {
 }
 
 class ApiService {
+  [x: string]: any;
   private baseURL: string;
 
   constructor() {

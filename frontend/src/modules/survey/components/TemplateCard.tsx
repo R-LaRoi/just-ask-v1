@@ -50,11 +50,7 @@ const TemplateCard: React.FC<TemplateCardProps> = ({
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
             <Text style={[styles.cardIcon, { color: textColor }]}>{template.icon}</Text>
-            {isSelected && (
-              <View style={styles.selectedBadge}>
-                <Text style={styles.selectedText}>✓</Text>
-              </View>
-            )}
+            <Text style={styles.selectedText}>✓</Text>
           </View>
 
           <Text style={[styles.cardTitle, { color: textColor }]}>{template.title}</Text>

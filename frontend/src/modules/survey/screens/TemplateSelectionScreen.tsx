@@ -99,7 +99,7 @@ export default function TemplateSelectionScreen() {
           activeOpacity={0.8}
         >
           <View style={styles.customButtonContent}>
-            <Text style={styles.customButtonIcon}>✨</Text>
+            <Text style={styles.customButtonIcon}>+</Text>
             <Text style={styles.customButtonTitle}>Start from Scratch</Text>
             <Text style={styles.customButtonSubtitle}>Create a custom survey</Text>
           </View>

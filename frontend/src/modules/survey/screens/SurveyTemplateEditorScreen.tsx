@@ -133,7 +133,7 @@ export default function SurveyTemplateEditorScreen() {
           activeOpacity={0.8}
         >
           <Text style={[styles.modeButtonText, viewMode === 'demo' && styles.demoModeButtonText]}>
-            {viewMode === 'edit' ? '▶️ Demo' : '✏️ Edit'}
+            {viewMode === 'edit' ? 'Demo' : 'Edit'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -146,7 +146,7 @@ export default function SurveyTemplateEditorScreen() {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Text style={styles.demoBannerText}>🎯 DEMO MODE</Text>
+          <Text style={styles.demoBannerText}>DEMO MODE</Text>
           <Text style={styles.demoBannerSubtext}>Interactive preview • Changes reset demo</Text>
         </LinearGradient>
       )}

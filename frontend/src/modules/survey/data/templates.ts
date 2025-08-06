@@ -2,11 +2,11 @@ import { SurveyTemplate } from '../types/survey';
 
 export const SURVEY_TEMPLATES: SurveyTemplate[] = [
   {
-    id: 'simple-poll',  // Changed from 'feature-feedback' to 'simple-poll'
+    id: 'simple-poll',
     title: 'Poll',
     description: '1 question • 30 sec',
     completionRate: '95% completion rate',
-    icon: '📊',
+    icon: '', // Removed 📊
     estimatedTime: '30 sec',
     questionCount: 1,
     questions: [
@@ -25,7 +25,7 @@ export const SURVEY_TEMPLATES: SurveyTemplate[] = [
     title: 'Know My Audience',
     description: '3 questions • 2 min',
     completionRate: '85% completion rate',
-    icon: '👥',
+    icon: '', // Removed 👥
     estimatedTime: '2 min',
     questionCount: 3,
     questions: [
@@ -57,7 +57,7 @@ export const SURVEY_TEMPLATES: SurveyTemplate[] = [
     title: 'Product Feedback',
     description: '5 questions • 3 min',
     completionRate: '78% completion rate',
-    icon: '📦',
+    icon: '', // Removed 📦
     estimatedTime: '3 min',
     questionCount: 5,
     questions: [
@@ -97,11 +97,11 @@ export const SURVEY_TEMPLATES: SurveyTemplate[] = [
     ]
   },
   {
-    id: 'feature-feedback',  // Keep this one as is
+    id: 'feature-feedback',
     title: 'Feature Feedback',
     description: '5 questions • 3 min',
     completionRate: '72% completion rate',
-    icon: '⚡',
+    icon: '', // Removed ⚡
     estimatedTime: '3 min',
     questionCount: 5,
     questions: [

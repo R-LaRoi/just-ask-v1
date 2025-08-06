@@ -116,7 +116,7 @@ export default function TemplateSelector({ onSelectTemplate, onCreateNew }: Temp
         >
           <View style={styles.createNewContent}>
             <View style={styles.createNewTextContainer}>
-              <Text style={styles.createNewIcon}>✨</Text>
+              <Text style={styles.createNewIcon}>+</Text>
               <Text style={styles.createNewTitle}>Start from Scratch</Text>
               <Text style={styles.createNewSubtitle}>
                 Create a custom survey with your own questions

@@ -136,7 +136,7 @@ export default function SurveyTakingScreen() {
       completeSurvey();
       setTimeout(() => {
         Alert.alert(
-          '🎉 Survey Complete!',
+          'Survey Complete!',
           'Thank you for sharing your thoughts with us.',
           [
             {
@@ -268,7 +268,7 @@ export default function SurveyTakingScreen() {
                 styles.continueButtonText,
                 !canContinue && styles.disabledButtonText
               ]}>
-                {isLastQuestion ? '✓ Complete Survey' : 'Continue →'}
+                {isLastQuestion ? 'Complete Survey' : 'Continue'}
               </Text>
             </TouchableOpacity>
 
